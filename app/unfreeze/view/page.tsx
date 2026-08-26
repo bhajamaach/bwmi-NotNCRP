@@ -1,16 +1,17 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { GrievanceTimeline } from "@/components/GrievanceTimeline";
 import { Icon } from "@/components/Icon";
 import { useMockData } from "@/components/MockDataProvider";
 import { FieldChip, PageSection, PrimaryLink, SecondaryLink } from "@/components/ui";
 import { kycSlots } from "@/lib/grievance";
 
-export default function GrievanceDetailPage() {
-  const params = useParams<{ id: string }>();
+function GrievanceDetailContent() {
+  const params = useSearchParams();
   const { grievances, scheduleKycSlot } = useMockData();
-  const petition = grievances.find((item) => item.id === params.id);
+  const petition = grievances.find((item) => item.id === params.get("id"));
 
   if (!petition) {
     return (
@@ -116,5 +117,19 @@ export default function GrievanceDetailPage() {
         </aside>
       </div>
     </PageSection>
+  );
+}
+
+export default function GrievanceDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageSection>
+          <div className="h-72 border border-line rounded-card bg-bg-subtle" />
+        </PageSection>
+      }
+    >
+      <GrievanceDetailContent />
+    </Suspense>
   );
 }

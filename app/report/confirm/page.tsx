@@ -25,7 +25,7 @@ function ConfirmContent() {
           {complaint ? <CopyButton value={complaint.ackNumber} /> : null}
         </div>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          {complaint ? <PrimaryLink href={`/track/${complaint.id}`}>Open timeline</PrimaryLink> : null}
+          {complaint ? <PrimaryLink href={`/track/view?id=${complaint.id}`}>Open timeline</PrimaryLink> : null}
           <SecondaryLink href="/track">View dashboard</SecondaryLink>
         </div>
       </div>

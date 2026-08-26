@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { EscalationPrompt } from "@/components/EscalationPrompt";
 import { FundRestorationCard } from "@/components/FundRestorationCard";
 import { Icon } from "@/components/Icon";
@@ -12,10 +12,10 @@ import { Button, CopyButton, FieldChip, PageSection, PrimaryLink, SecondaryLink 
 import { getSlaForCategory } from "@/lib/sla-config";
 import { formatDateTime, statusLabel } from "@/lib/status";
 
-export default function ComplaintDetailPage() {
-  const params = useParams<{ id: string }>();
+function ComplaintDetailContent() {
+  const params = useSearchParams();
   const { complaints, addCitizenNote } = useMockData();
-  const complaint = complaints.find((item) => item.id === params.id);
+  const complaint = complaints.find((item) => item.id === params.get("id"));
   const [noteText, setNoteText] = useState("");
   const [noteConfirmed, setNoteConfirmed] = useState(false);
 
@@ -162,5 +162,19 @@ export default function ComplaintDetailPage() {
         </aside>
       </div>
     </PageSection>
+  );
+}
+
+export default function ComplaintDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageSection>
+          <div className="h-72 border border-line rounded-card bg-bg-subtle" />
+        </PageSection>
+      }
+    >
+      <ComplaintDetailContent />
+    </Suspense>
   );
 }

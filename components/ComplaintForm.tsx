@@ -96,7 +96,7 @@ export function ComplaintForm({
             isAnonymous
           });
           window.sessionStorage.setItem("last-ack", complaint.ackNumber);
-          router.push(isUrgent ? `/track/${complaint.id}` : `/report/confirm?id=${complaint.id}`);
+          router.push(isUrgent ? `/track/view?id=${complaint.id}` : `/report/confirm?id=${complaint.id}`);
         }, 650);
       }}
     >
