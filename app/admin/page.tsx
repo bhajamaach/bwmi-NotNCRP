@@ -1,0 +1,217 @@
+"use client";
+
+import { useState } from "react";
+import { useMockData } from "@/components/MockDataProvider";
+import { PageSection } from "@/components/ui";
+import { grievanceStageLabel } from "@/lib/grievance";
+import { isSlaExceeded, statusLabel, statusSteps } from "@/lib/status";
+import type { ComplaintStatus } from "@/lib/types";
+
+const nextStatus: Record<ComplaintStatus, ComplaintStatus> = {
+  RECEIVED: "ASSIGNED",
+  ASSIGNED: "BANK_NOTIFIED",
+  BANK_NOTIFIED: "INVESTIGATING",
+  INVESTIGATING: "RESOLVED",
+  RESOLVED: "RESOLVED"
+};
+
+const grievanceActionLabel: Record<string, string> = {
+  SUBMITTED: "Waiting on citizen to book KYC",
+  KYC_SCHEDULED: "Mark review complete",
+  IO_REVIEW: "Issue NOC",
+  NOC_ISSUED: "Done"
+};
+
+export default function AdminPage() {
+  const { complaints, updateStatus, grievances, advanceGrievance } = useMockData();
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | ComplaintStatus>("ALL");
+  const [confirmedId, setConfirmedId] = useState<string | null>(null);
+  const [confirmedGrievanceId, setConfirmedGrievanceId] = useState<string | null>(null);
+
+  const filteredComplaints = complaints.filter((complaint) => {
+    const matchesSearch = complaint.ackNumber.toLowerCase().includes(search.trim().toLowerCase());
+    const matchesStatus = statusFilter === "ALL" || complaint.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const byCategory = complaints.reduce<Record<string, number>>((acc, complaint) => {
+    acc[complaint.category] = (acc[complaint.category] ?? 0) + 1;
+    return acc;
+  }, {});
+  const categoryBreakdown = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
+  const escalatedCount = complaints.filter((complaint) => isSlaExceeded(complaint) || complaint.escalated).length;
+  const resolvedCount = complaints.filter((complaint) => complaint.status === "RESOLVED").length;
+  const maxCategoryCount = Math.max(1, ...categoryBreakdown.map(([, count]) => count));
+
+  return (
+    <PageSection>
+      <div>
+        <p className="font-mono text-sm font-semibold text-navy">Internal view</p>
+        <h1 className="mt-1 text-3xl font-bold text-ink">Cyber Cell dashboard</h1>
+        <p className="mt-2 text-ink-muted">Advance a complaint's status and it updates immediately on the citizen's tracking page.</p>
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="border border-line rounded-card bg-white p-4">
+            <p className="font-mono text-2xl font-bold text-ink">{complaints.length}</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">Total complaints</p>
+          </div>
+          <div className="border border-line rounded-card bg-white p-4">
+            <p className="font-mono text-2xl font-bold text-amber">{escalatedCount}</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">Escalated / overdue</p>
+          </div>
+          <div className="border border-line rounded-card bg-white p-4">
+            <p className="font-mono text-2xl font-bold text-teal">{resolvedCount}</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">Resolved</p>
+          </div>
+        </div>
+        <div className="border border-line rounded-card bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Pattern by category</p>
+          <p className="mt-1 text-xs text-ink-muted">
+            This session&rsquo;s complaints only — a local stand-in for the kind of cross-case pattern view a real Samanvay-style analytics
+            layer would run over the full national caseload.
+          </p>
+          <div className="mt-3 space-y-2">
+            {categoryBreakdown.map(([category, count]) => (
+              <div className="flex items-center gap-3" key={category}>
+                <span className="w-40 shrink-0 truncate text-sm text-ink-muted" title={category}>{category}</span>
+                <div className="h-3 flex-1 overflow-hidden rounded-input bg-bg-subtle">
+                  <div className="h-full rounded-input bg-navy" style={{ width: `${(count / maxCategoryCount) * 100}%` }} />
+                </div>
+                <span className="w-5 shrink-0 text-right font-mono text-sm text-ink">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <label className="block text-sm font-semibold text-ink" htmlFor="adminSearch">
+            Search by acknowledgement number
+          </label>
+          <input
+            className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-2 font-mono text-ink"
+            id="adminSearch"
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="NCRP-..."
+            value={search}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-ink" htmlFor="adminStatusFilter">
+            Filter by status
+          </label>
+          <select
+            className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-2 text-ink sm:w-56"
+            id="adminStatusFilter"
+            onChange={(event) => setStatusFilter(event.target.value as "ALL" | ComplaintStatus)}
+            value={statusFilter}
+          >
+            <option value="ALL">All statuses</option>
+            {statusSteps.map((step) => (
+              <option key={step.status} value={step.status}>
+                {step.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="mt-6 overflow-hidden border border-line rounded-card bg-white">
+        <div className="grid grid-cols-1 border-b border-line bg-bg-subtle p-4 text-sm font-semibold text-ink md:grid-cols-[1fr_0.8fr_0.8fr_0.6fr]">
+          <span>Complaint</span>
+          <span>Category</span>
+          <span>Status</span>
+          <span>Action</span>
+        </div>
+        {filteredComplaints.length === 0 ? (
+          <div className="p-4 text-ink-muted">No complaints match this search or filter.</div>
+        ) : (
+          filteredComplaints.map((complaint) => {
+            const target = nextStatus[complaint.status];
+            return (
+              <div className="grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.6fr] md:items-center" key={complaint.id}>
+                <div>
+                  <p className="font-mono font-semibold text-ink">{complaint.ackNumber}</p>
+                  <p className="text-sm text-ink-muted">{isSlaExceeded(complaint) ? "SLA exceeded" : "Within SLA window"}</p>
+                </div>
+                <p className="text-ink-muted">{complaint.category}</p>
+                <p className="text-ink-muted">{statusLabel(complaint.status)}</p>
+                <div>
+                  <button
+                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle disabled:opacity-50"
+                    disabled={complaint.status === "RESOLVED"}
+                    onClick={() => {
+                      updateStatus(complaint.id, target, `The cyber cell updated the status to ${statusLabel(target)}.`);
+                      setConfirmedId(complaint.id);
+                      window.setTimeout(() => setConfirmedId(null), 1500);
+                    }}
+                    type="button"
+                  >
+                    {complaint.status === "RESOLVED" ? "Done" : "Advance"}
+                  </button>
+                  {confirmedId === complaint.id ? <p className="mt-1 text-sm font-medium text-teal">Status updated.</p> : null}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <div className="mt-12">
+        <p className="font-mono text-sm font-semibold text-navy">Self-service grievance queue</p>
+        <h2 className="mt-1 text-2xl font-bold text-ink">Unfreezing petitions</h2>
+        <p className="mt-2 text-ink-muted">
+          Petitions move to &ldquo;Video-KYC scheduled&rdquo; on their own once the citizen books a slot. The remaining steps — review and
+          NOC issuance — are officer actions from here, and mutate the same state the citizen sees on their petition page.
+        </p>
+      </div>
+      <div className="mt-6 overflow-hidden border border-line rounded-card bg-white">
+        <div className="grid grid-cols-1 border-b border-line bg-bg-subtle p-4 text-sm font-semibold text-ink md:grid-cols-[1fr_0.8fr_0.8fr_0.7fr]">
+          <span>Petition</span>
+          <span>Account</span>
+          <span>Stage</span>
+          <span>Action</span>
+        </div>
+        {grievances.length === 0 ? (
+          <div className="p-4 text-ink-muted">No unfreezing petitions yet.</div>
+        ) : (
+          grievances.map((petition) => {
+            const canAdvance = petition.stage === "KYC_SCHEDULED" || petition.stage === "IO_REVIEW";
+            return (
+              <div
+                className="grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.7fr] md:items-center"
+                key={petition.id}
+              >
+                <p className="font-mono font-semibold text-ink">{petition.petitionNumber}</p>
+                <p className="font-mono text-ink-muted">&hellip;{petition.accountNumber.slice(-4)}</p>
+                <p className="text-ink-muted">{grievanceStageLabel(petition.stage)}</p>
+                <div>
+                  <button
+                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle disabled:opacity-50"
+                    disabled={!canAdvance}
+                    onClick={() => {
+                      const note =
+                        petition.stage === "KYC_SCHEDULED"
+                          ? "The investigating officer completed the video-KYC review."
+                          : "The investigating officer approved the petition and issued a digital NOC to the bank.";
+                      advanceGrievance(petition.id, note);
+                      setConfirmedGrievanceId(petition.id);
+                      window.setTimeout(() => setConfirmedGrievanceId(null), 1500);
+                    }}
+                    type="button"
+                  >
+                    {grievanceActionLabel[petition.stage]}
+                  </button>
+                  {confirmedGrievanceId === petition.id ? <p className="mt-1 text-sm font-medium text-teal">Updated.</p> : null}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </PageSection>
+  );
+}
