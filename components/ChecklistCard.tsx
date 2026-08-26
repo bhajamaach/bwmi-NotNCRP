@@ -95,9 +95,9 @@ export function ChecklistCard({
                   <label className="block text-sm text-ink-muted" htmlFor="bankLookup">
                     Look up the receiving branch by IFSC code
                   </label>
-                  <div className="mt-1 flex gap-2">
+                  <div className="mt-1 flex flex-col gap-2 sm:flex-row">
                     <input
-                      className="focus-ring w-full rounded-input border border-line bg-white px-3 py-2 font-mono uppercase text-ink"
+                      className="focus-ring w-full min-w-0 rounded-input border border-line bg-white px-3 py-2 font-mono uppercase text-ink"
                       id="bankLookup"
                       maxLength={11}
                       onChange={(event) => setIfsc(event.target.value)}

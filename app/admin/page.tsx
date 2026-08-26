@@ -53,18 +53,18 @@ export default function AdminPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="grid grid-cols-3 gap-3">
-          <div className="border border-line rounded-card bg-white p-4">
-            <p className="font-mono text-2xl font-bold text-ink">{complaints.length}</p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">Total complaints</p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="border border-line rounded-card bg-white p-3 sm:p-4">
+            <p className="font-mono text-xl font-bold text-ink sm:text-2xl">{complaints.length}</p>
+            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">Total</p>
           </div>
-          <div className="border border-line rounded-card bg-white p-4">
-            <p className="font-mono text-2xl font-bold text-amber">{escalatedCount}</p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">Escalated / overdue</p>
+          <div className="border border-line rounded-card bg-white p-3 sm:p-4">
+            <p className="font-mono text-xl font-bold text-amber sm:text-2xl">{escalatedCount}</p>
+            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">Escalated</p>
           </div>
-          <div className="border border-line rounded-card bg-white p-4">
-            <p className="font-mono text-2xl font-bold text-teal">{resolvedCount}</p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">Resolved</p>
+          <div className="border border-line rounded-card bg-white p-3 sm:p-4">
+            <p className="font-mono text-xl font-bold text-teal sm:text-2xl">{resolvedCount}</p>
+            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">Resolved</p>
           </div>
         </div>
         <div className="border border-line rounded-card bg-white p-4">

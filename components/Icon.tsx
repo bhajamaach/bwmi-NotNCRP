@@ -9,12 +9,14 @@ import {
   IconIdBadge2,
   IconLock,
   IconLockOpen,
+  IconMenu2,
   IconPhone,
   IconSearch,
   IconShieldCheck,
   IconUpload,
   IconUser,
   IconVideo,
+  IconX,
   type Icon as TablerIcon
 } from "@tabler/icons-react";
 
@@ -24,11 +26,13 @@ type IconName =
   | "bank"
   | "check"
   | "clock"
+  | "close"
   | "file"
   | "fingerprint"
   | "id"
   | "lock"
   | "unlock"
+  | "menu"
   | "phone"
   | "search"
   | "shield"
@@ -42,11 +46,13 @@ const icons: Record<IconName, TablerIcon> = {
   bank: IconBuildingBank,
   check: IconCheck,
   clock: IconClock,
+  close: IconX,
   file: IconFile,
   fingerprint: IconFingerprint,
   id: IconIdBadge2,
   lock: IconLock,
   unlock: IconLockOpen,
+  menu: IconMenu2,
   phone: IconPhone,
   search: IconSearch,
   shield: IconShieldCheck,
