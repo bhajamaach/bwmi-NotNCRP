@@ -7,13 +7,13 @@ const hoursFromNow = (hours: number) => new Date(now.getTime() + hours * 60 * 60
 export const demoUsers: DemoUser[] = [
   {
     id: "user-demo-active",
-    name: "Aarav Mehta",
+    name: "Kanishka Das",
     mobile: "9000000001",
     isDemo: true
   },
   {
     id: "user-demo-empty",
-    name: "Nisha Rao",
+    name: "Nancy Shilal",
     mobile: "9000000002",
     isDemo: true
   }

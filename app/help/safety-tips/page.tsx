@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/LocaleProvider";
 import { PageSection } from "@/components/ui";
 
 const tips = [
@@ -24,18 +27,25 @@ const tips = [
 ];
 
 export default function SafetyTipsPage() {
+  const { t } = useLocale();
   return (
     <PageSection className="max-w-3xl">
-      <p className="text-sm font-medium text-navy">Resources</p>
-      <h1 className="mt-2 text-3xl font-bold text-ink">Cyber safety tips</h1>
-      <p className="mt-4 text-ink-muted">General, plain-language guidance to reduce the chance of financial fraud and account compromise.</p>
+      <div className="animate-reveal">
+        <p className="text-sm font-medium text-navy">{t("Resources")}</p>
+        <h1 className="mt-2 text-3xl font-bold text-ink">{t("Cyber safety tips")}</h1>
+        <p className="mt-4 text-ink-muted">{t("General, plain-language guidance to reduce the chance of financial fraud and account compromise.")}</p>
+      </div>
       <ol className="mt-6 space-y-4">
         {tips.map((tip, index) => (
-          <li className="flex gap-4 rounded-card border border-line bg-white p-5" key={tip.title}>
+          <li
+            className="animate-reveal flex gap-4 rounded-card border border-line bg-white p-5"
+            key={tip.title}
+            style={{ animationDelay: `${70 + index * 60}ms` }}
+          >
             <span className="font-mono text-sm text-ink-muted">{String(index + 1).padStart(2, "0")}</span>
             <div>
-              <p className="font-semibold text-ink">{tip.title}</p>
-              <p className="mt-1 text-sm text-ink-muted">{tip.body}</p>
+              <p className="font-semibold text-ink">{t(tip.title)}</p>
+              <p className="mt-1 text-sm text-ink-muted">{t(tip.body)}</p>
             </div>
           </li>
         ))}

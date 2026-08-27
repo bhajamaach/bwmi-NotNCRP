@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
+import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
 import { FieldError, RequiredMark, buttonPrimaryClass } from "@/components/ui";
 import type { EvidenceFile } from "@/lib/types";
@@ -33,6 +34,7 @@ export function ComplaintForm({
   isAnonymous?: boolean;
 }) {
   const router = useRouter();
+  const { t } = useLocale();
   const { createComplaint } = useMockData();
   const [selectedSubCategory, setSelectedSubCategory] = useState(subCategory ?? urgentSubCategories[0]);
   const [amount, setAmount] = useState("");
@@ -101,21 +103,22 @@ export function ComplaintForm({
       }}
     >
       <div className="border-b border-line pb-4">
-        <h2 className="text-xl font-bold leading-tight text-ink">Complaint details</h2>
-        <p className="mt-1 text-sm text-ink-muted">Required fields are marked. Validation appears beside each field before submission.</p>
+        <h2 className="text-xl font-bold leading-tight text-ink">{t("Complaint details")}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t("Required fields are marked. Validation appears beside each field before submission.")}</p>
       </div>
 
       {isAnonymous ? (
-        <div className="mt-4 border border-line border-l-4 border-l-navy rounded-control bg-bg-subtle p-3 text-sm text-ink">
-          Filed anonymously — no name, account, or login is attached. Save your acknowledgement number after submitting; it&rsquo;s the only
-          way to check this report&rsquo;s status later.
+        <div className="animate-reveal mt-4 border border-line border-l-4 border-l-navy rounded-control bg-bg-subtle p-3 text-sm text-ink">
+          {t(
+            "Filed anonymously — no name, account, or login is attached. Save your acknowledgement number after submitting; it’s the only way to check this report’s status later."
+          )}
         </div>
       ) : null}
 
       <div className="mt-5 grid gap-5">
         <div>
           <label className="block text-sm font-semibold text-ink" htmlFor="category">
-            Category<RequiredMark />
+            {t("Category")}<RequiredMark />
           </label>
           <input
             className="mt-2 w-full rounded-input border border-line bg-bg-subtle px-3 py-3 text-ink"
@@ -128,7 +131,7 @@ export function ComplaintForm({
 
         <div>
           <label className="block text-sm font-semibold text-ink" htmlFor="subCategory">
-            Subcategory<RequiredMark />
+            {t("Subcategory")}<RequiredMark />
           </label>
           {isUrgent ? (
             <select
@@ -153,10 +156,10 @@ export function ComplaintForm({
         </div>
 
         {isUrgent ? (
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="animate-reveal grid gap-5 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-semibold text-ink" htmlFor="amount">
-                Amount lost<RequiredMark />
+                {t("Amount lost")}<RequiredMark />
               </label>
               <input
                 className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-3 font-mono text-ink"
@@ -170,7 +173,7 @@ export function ComplaintForm({
             </div>
             <div>
               <label className="block text-sm font-semibold text-ink" htmlFor="transactionId">
-                Transaction ID / UTR<RequiredMark />
+                {t("Transaction ID / UTR")}<RequiredMark />
               </label>
               <input
                 className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-3 font-mono text-ink"
@@ -186,7 +189,7 @@ export function ComplaintForm({
 
         <div>
           <label className="block text-sm font-semibold text-ink" htmlFor="incidentAt">
-            Incident date and time<RequiredMark />
+            {t("Incident date and time")}<RequiredMark />
           </label>
           <input
             className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-3 text-ink"
@@ -200,18 +203,20 @@ export function ComplaintForm({
 
         <div>
           <label className="block text-sm font-semibold text-ink" htmlFor="description">
-            Description<RequiredMark />
+            {t("Description")}<RequiredMark />
           </label>
           <textarea
             className="focus-ring mt-2 min-h-32 w-full rounded-input border border-line bg-white px-3 py-3 text-ink"
             id="description"
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Explain what happened, who contacted you, what changed in your account, and what evidence you have."
+            placeholder={t("Explain what happened, who contacted you, what changed in your account, and what evidence you have.")}
             value={description}
           />
           <div className="mt-1 flex justify-between gap-3 text-sm text-ink-muted">
-            <span>Minimum 45 characters.</span>
-            <span className="font-mono">{description.trim().length}/45</span>
+            <span>{t("Minimum 45 characters.")}</span>
+            <span className={`font-mono transition-colors duration-200 ${description.trim().length >= 45 ? "text-teal" : ""}`}>
+              {description.trim().length}/45
+            </span>
           </div>
           <FieldError id="description-error">{errors.description}</FieldError>
         </div>
@@ -219,13 +224,23 @@ export function ComplaintForm({
         <EvidenceUpload files={evidence} onChange={setEvidence} onDetectedReference={isUrgent ? setTransactionId : undefined} />
 
         {submitError ? (
-          <div className="border border-line border-l-4 border-l-error rounded-control bg-white px-4 py-3 text-sm font-medium text-error" role="alert">
+          <div
+            className="animate-reveal border border-line border-l-4 border-l-error rounded-control bg-white px-4 py-3 text-sm font-medium text-error"
+            role="alert"
+          >
             {submitError}
           </div>
         ) : null}
 
         <button className={buttonPrimaryClass} disabled={!isValid || isSubmitting} type="submit">
-          {isSubmitting ? "Submitting..." : "Submit complaint"}
+          {isSubmitting ? (
+            <>
+              <span aria-hidden className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              {t("Submitting...")}
+            </>
+          ) : (
+            t("Submit complaint")
+          )}
         </button>
       </div>
     </form>

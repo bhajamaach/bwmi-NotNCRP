@@ -14,8 +14,10 @@ function ConfirmContent() {
 
   return (
     <PageSection>
-      <div className="mx-auto max-w-2xl border border-line rounded-card bg-white p-6 text-center">
-        <Icon className="mx-auto h-8 w-8 text-teal" name="check" />
+      <div className="animate-reveal mx-auto max-w-2xl border border-line rounded-card bg-white p-6 text-center">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-bg-subtle">
+          <Icon className="h-8 w-8 animate-pop text-teal" name="check" />
+        </span>
         <h1 className="mt-4 text-3xl font-bold text-ink">Complaint received</h1>
         <p className="mt-2 text-ink-muted">Your acknowledgement number is ready for tracking.</p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">

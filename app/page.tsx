@@ -36,16 +36,16 @@ export default function HomePage() {
 
   return (
     <PageSection>
-      <h1 className="max-w-4xl text-4xl font-bold leading-tight text-ink sm:text-6xl">
+      <h1 className="animate-reveal max-w-4xl text-4xl font-bold leading-tight text-ink sm:text-6xl">
         {t("Is this happening right now, or did you just lose money?")}
       </h1>
-      <p className="mt-3 max-w-2xl text-ink-muted">
+      <p className="animate-reveal mt-3 max-w-2xl text-ink-muted" style={{ animationDelay: "70ms" }}>
         {t(
           "Financial fraud can often still be slowed if you act quickly. We ask about urgency first, then guide reporting and tracking with less uncertainty than a single long form."
         )}
       </p>
 
-      <div className={`mt-8 ${choiceListClass}`}>
+      <div className={`animate-reveal mt-8 ${choiceListClass}`} style={{ animationDelay: "140ms" }}>
         {choices.map((choice) => (
           <Link
             className={`${choiceRowClass} gap-4 p-5 sm:gap-6`}
@@ -62,8 +62,12 @@ export default function HomePage() {
       </div>
 
       <section className="mt-10 grid gap-4 sm:grid-cols-3">
-        {featureCards.map(([title, copy]) => (
-          <div className="border border-line rounded-card bg-white p-5" key={title}>
+        {featureCards.map(([title, copy], index) => (
+          <div
+            className="animate-reveal border border-line rounded-card bg-white p-5 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+            key={title}
+            style={{ animationDelay: `${220 + index * 70}ms` }}
+          >
             <h2 className="font-bold text-ink">{t(title)}</h2>
             <p className="mt-2 text-sm text-ink-muted">{t(copy)}</p>
           </div>

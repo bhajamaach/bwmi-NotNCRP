@@ -20,13 +20,13 @@ export default function LoginPage() {
 
   return (
     <PageSection>
-      <div className="mx-auto max-w-xl border border-line rounded-card bg-white p-6">
+      <div className="animate-reveal mx-auto max-w-xl border border-line rounded-card bg-white p-6">
         <h1 className="text-3xl font-bold text-ink">{t("Login")}</h1>
         <p className="mt-2 text-ink-muted">{t("Use one of the sample numbers below and any six-digit code, such as 123456.")}</p>
         <div className="mt-5 border border-line rounded-control bg-bg-subtle p-4 text-sm text-ink-muted">
           <p className="font-semibold text-ink">{t("Sample accounts")}</p>
           {demoUsers.map((user) => (
-            <button className="focus-ring mt-2 block rounded-control px-2 py-1 text-left hover:bg-white" key={user.id} onClick={() => setMobile(user.mobile)} type="button">
+            <button className="focus-ring mt-2 block rounded-control px-2 py-1 text-left transition-colors duration-150 hover:bg-white active:scale-[0.99]" key={user.id} onClick={() => setMobile(user.mobile)} type="button">
               {user.name}: <span className="font-mono">{user.mobile}</span>
             </button>
           ))}
@@ -39,14 +39,14 @@ export default function LoginPage() {
             setError("");
             if (step === "mobile") {
               if (!isValidDemoMobile(mobile)) {
-                setError("Enter one of the sample mobile numbers above.");
+                setError(t("Enter one of the sample mobile numbers above."));
                 return;
               }
               setStep("otp");
               return;
             }
             if (!isValidOtp(otp)) {
-              setError("Enter any six-digit code.");
+              setError(t("Enter any six-digit code."));
               return;
             }
             const user = findDemoUserByMobile(mobile);
@@ -65,7 +65,7 @@ export default function LoginPage() {
             />
           </div>
           {step === "otp" ? (
-            <div>
+            <div className="animate-reveal">
               <label className="block text-sm font-semibold text-ink" htmlFor="otp">{t("OTP")}</label>
               <input
                 className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-3 font-mono"

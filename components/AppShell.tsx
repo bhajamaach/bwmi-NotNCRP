@@ -58,48 +58,55 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
-              className="focus-ring-invert flex h-10 w-10 items-center justify-center rounded-control border border-white/40 text-white"
+              className="focus-ring-invert flex h-10 w-10 items-center justify-center rounded-control border border-white/40 text-white transition-transform duration-150 active:scale-90"
               onClick={() => setMenuOpen((value) => !value)}
               type="button"
             >
-              <Icon className="h-5 w-5" name={menuOpen ? "close" : "menu"} />
+              <Icon className="h-5 w-5 transition-transform duration-200" name={menuOpen ? "close" : "menu"} />
             </button>
           </div>
         </div>
 
-        {menuOpen ? (
-          <nav aria-label="Primary" className="border-t border-navy-hover bg-white px-4 py-3 sm:hidden">
-            <div className="grid gap-1">
-              {navItems.map((item) => (
-                <Link className={mobileNavLinkClass} href={item.href} key={item.href} onClick={() => setMenuOpen(false)}>
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-            <div className="mt-3 border-t border-line pt-3">
-              {currentUser ? (
-                <button
-                  className="focus-ring w-full rounded-control border border-line bg-navy px-4 py-3 text-center font-semibold text-white"
-                  onClick={() => {
-                    logout();
-                    setMenuOpen(false);
-                  }}
-                  type="button"
-                >
-                  {t("Sign out")}
-                </button>
-              ) : (
-                <Link
-                  className="focus-ring block w-full rounded-control border border-line bg-navy px-4 py-3 text-center font-semibold text-white"
-                  href="/login"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {t("Login")}
-                </Link>
-              )}
-            </div>
-          </nav>
-        ) : null}
+        <div
+          aria-hidden={!menuOpen}
+          className={`grid border-t bg-white transition-[grid-template-rows,border-color] duration-300 ease-out sm:hidden ${
+            menuOpen ? "grid-rows-[1fr] border-navy-hover" : "grid-rows-[0fr] border-transparent"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <nav aria-label="Primary" className="px-4 py-3">
+              <div className="grid gap-1">
+                {navItems.map((item) => (
+                  <Link className={mobileNavLinkClass} href={item.href} key={item.href} onClick={() => setMenuOpen(false)}>
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-3 border-t border-line pt-3">
+                {currentUser ? (
+                  <button
+                    className="focus-ring w-full rounded-control border border-line bg-navy px-4 py-3 text-center font-semibold text-white transition-transform duration-150 active:scale-[0.98]"
+                    onClick={() => {
+                      logout();
+                      setMenuOpen(false);
+                    }}
+                    type="button"
+                  >
+                    {t("Sign out")}
+                  </button>
+                ) : (
+                  <Link
+                    className="focus-ring block w-full rounded-control border border-line bg-navy px-4 py-3 text-center font-semibold text-white transition-transform duration-150 active:scale-[0.98]"
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("Login")}
+                  </Link>
+                )}
+              </div>
+            </nav>
+          </div>
+        </div>
       </header>
       <main className="flex-1">{children}</main>
       <footer className="border-t border-line bg-bg-subtle">
@@ -137,7 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <summary className="focus-ring cursor-pointer list-none hover:text-navy">{t("How this works")}</summary>
                     <p className="mt-2 max-w-xs text-ink-muted">
                       {t(
-                        "Login, bank contact, 1930, evidence review, and fund liens run against a local session rather than live banking or government systems. Evidence fingerprints are real SHA-256 hashes, computed in your browser. English only for now."
+                        "Login, bank contact, 1930, evidence review, and fund liens run against a local session rather than live banking or government systems. Evidence fingerprints are real SHA-256 hashes, computed in your browser. Hindi coverage is deliberately scoped to the screens where translation accuracy matters most."
                       )}
                     </p>
                   </details>

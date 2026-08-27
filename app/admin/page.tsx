@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/Icon";
+import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
 import { PageSection } from "@/components/ui";
 import { grievanceStageLabel } from "@/lib/grievance";
@@ -23,6 +25,7 @@ const grievanceActionLabel: Record<string, string> = {
 };
 
 export default function AdminPage() {
+  const { t } = useLocale();
   const { complaints, updateStatus, grievances, advanceGrievance } = useMockData();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | ComplaintStatus>("ALL");
@@ -46,32 +49,33 @@ export default function AdminPage() {
 
   return (
     <PageSection>
-      <div>
-        <p className="font-mono text-sm font-semibold text-navy">Internal view</p>
-        <h1 className="mt-1 text-3xl font-bold text-ink">Cyber Cell dashboard</h1>
-        <p className="mt-2 text-ink-muted">Advance a complaint's status and it updates immediately on the citizen's tracking page.</p>
+      <div className="animate-reveal">
+        <p className="font-mono text-sm font-semibold text-navy">{t("Internal view")}</p>
+        <h1 className="mt-1 text-3xl font-bold text-ink">{t("Cyber Cell dashboard")}</h1>
+        <p className="mt-2 text-ink-muted">{t("Advance a complaint's status and it updates immediately on the citizen's tracking page.")}</p>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="animate-reveal mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]" style={{ animationDelay: "60ms" }}>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="border border-line rounded-card bg-white p-3 sm:p-4">
+          <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">
             <p className="font-mono text-xl font-bold text-ink sm:text-2xl">{complaints.length}</p>
-            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">Total</p>
+            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">{t("Total")}</p>
           </div>
-          <div className="border border-line rounded-card bg-white p-3 sm:p-4">
+          <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">
             <p className="font-mono text-xl font-bold text-amber sm:text-2xl">{escalatedCount}</p>
-            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">Escalated</p>
+            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">{t("Escalated")}</p>
           </div>
-          <div className="border border-line rounded-card bg-white p-3 sm:p-4">
+          <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">
             <p className="font-mono text-xl font-bold text-teal sm:text-2xl">{resolvedCount}</p>
-            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">Resolved</p>
+            <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">{t("Resolved")}</p>
           </div>
         </div>
         <div className="border border-line rounded-card bg-white p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Pattern by category</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t("Pattern by category")}</p>
           <p className="mt-1 text-xs text-ink-muted">
-            This session&rsquo;s complaints only — a local stand-in for the kind of cross-case pattern view a real Samanvay-style analytics
-            layer would run over the full national caseload.
+            {t(
+              "This session’s complaints only — a local stand-in for the kind of cross-case pattern view a real Samanvay-style analytics layer would run over the full national caseload."
+            )}
           </p>
           <div className="mt-3 space-y-2">
             {categoryBreakdown.map(([category, count]) => (
@@ -90,7 +94,7 @@ export default function AdminPage() {
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
           <label className="block text-sm font-semibold text-ink" htmlFor="adminSearch">
-            Search by acknowledgement number
+            {t("Search by acknowledgement number")}
           </label>
           <input
             className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-2 font-mono text-ink"
@@ -102,7 +106,7 @@ export default function AdminPage() {
         </div>
         <div>
           <label className="block text-sm font-semibold text-ink" htmlFor="adminStatusFilter">
-            Filter by status
+            {t("Filter by status")}
           </label>
           <select
             className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-2 text-ink sm:w-56"
@@ -110,10 +114,10 @@ export default function AdminPage() {
             onChange={(event) => setStatusFilter(event.target.value as "ALL" | ComplaintStatus)}
             value={statusFilter}
           >
-            <option value="ALL">All statuses</option>
+            <option value="ALL">{t("All statuses")}</option>
             {statusSteps.map((step) => (
               <option key={step.status} value={step.status}>
-                {step.label}
+                {t(step.label)}
               </option>
             ))}
           </select>
@@ -121,27 +125,27 @@ export default function AdminPage() {
       </div>
       <div className="mt-6 overflow-hidden border border-line rounded-card bg-white">
         <div className="grid grid-cols-1 border-b border-line bg-bg-subtle p-4 text-sm font-semibold text-ink md:grid-cols-[1fr_0.8fr_0.8fr_0.6fr]">
-          <span>Complaint</span>
-          <span>Category</span>
-          <span>Status</span>
-          <span>Action</span>
+          <span>{t("Complaint")}</span>
+          <span>{t("Category")}</span>
+          <span>{t("Status")}</span>
+          <span>{t("Action")}</span>
         </div>
         {filteredComplaints.length === 0 ? (
-          <div className="p-4 text-ink-muted">No complaints match this search or filter.</div>
+          <div className="p-4 text-ink-muted">{t("No complaints match this search or filter.")}</div>
         ) : (
           filteredComplaints.map((complaint) => {
             const target = nextStatus[complaint.status];
             return (
-              <div className="grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.6fr] md:items-center" key={complaint.id}>
+              <div className="animate-reveal grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.6fr] md:items-center" key={complaint.id}>
                 <div>
                   <p className="font-mono font-semibold text-ink">{complaint.ackNumber}</p>
-                  <p className="text-sm text-ink-muted">{isSlaExceeded(complaint) ? "SLA exceeded" : "Within SLA window"}</p>
+                  <p className="text-sm text-ink-muted">{isSlaExceeded(complaint) ? t("SLA exceeded") : t("Within SLA window")}</p>
                 </div>
                 <p className="text-ink-muted">{complaint.category}</p>
-                <p className="text-ink-muted">{statusLabel(complaint.status)}</p>
+                <p className="text-ink-muted">{t(statusLabel(complaint.status))}</p>
                 <div>
                   <button
-                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle disabled:opacity-50"
+                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95 disabled:opacity-50"
                     disabled={complaint.status === "RESOLVED"}
                     onClick={() => {
                       updateStatus(complaint.id, target, `The cyber cell updated the status to ${statusLabel(target)}.`);
@@ -150,9 +154,14 @@ export default function AdminPage() {
                     }}
                     type="button"
                   >
-                    {complaint.status === "RESOLVED" ? "Done" : "Advance"}
+                    {complaint.status === "RESOLVED" ? t("Done") : t("Advance")}
                   </button>
-                  {confirmedId === complaint.id ? <p className="mt-1 text-sm font-medium text-teal">Status updated.</p> : null}
+                  {confirmedId === complaint.id ? (
+                    <p className="animate-reveal mt-1 flex items-center gap-1 text-sm font-medium text-teal">
+                      <Icon className="h-3.5 w-3.5 animate-pop" name="check" />
+                      {t("Status updated.")}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             );
@@ -161,36 +170,37 @@ export default function AdminPage() {
       </div>
 
       <div className="mt-12">
-        <p className="font-mono text-sm font-semibold text-navy">Self-service grievance queue</p>
-        <h2 className="mt-1 text-2xl font-bold text-ink">Unfreezing petitions</h2>
+        <p className="font-mono text-sm font-semibold text-navy">{t("Self-service grievance queue")}</p>
+        <h2 className="mt-1 text-2xl font-bold text-ink">{t("Unfreezing petitions")}</h2>
         <p className="mt-2 text-ink-muted">
-          Petitions move to &ldquo;Video-KYC scheduled&rdquo; on their own once the citizen books a slot. The remaining steps — review and
-          NOC issuance — are officer actions from here, and mutate the same state the citizen sees on their petition page.
+          {t(
+            "Petitions move to \"Video-KYC scheduled\" on their own once the citizen books a slot. The remaining steps — review and NOC issuance — are officer actions from here, and mutate the same state the citizen sees on their petition page."
+          )}
         </p>
       </div>
       <div className="mt-6 overflow-hidden border border-line rounded-card bg-white">
         <div className="grid grid-cols-1 border-b border-line bg-bg-subtle p-4 text-sm font-semibold text-ink md:grid-cols-[1fr_0.8fr_0.8fr_0.7fr]">
-          <span>Petition</span>
-          <span>Account</span>
-          <span>Stage</span>
-          <span>Action</span>
+          <span>{t("Petition")}</span>
+          <span>{t("Account")}</span>
+          <span>{t("Stage")}</span>
+          <span>{t("Action")}</span>
         </div>
         {grievances.length === 0 ? (
-          <div className="p-4 text-ink-muted">No unfreezing petitions yet.</div>
+          <div className="p-4 text-ink-muted">{t("No unfreezing petitions yet.")}</div>
         ) : (
           grievances.map((petition) => {
             const canAdvance = petition.stage === "KYC_SCHEDULED" || petition.stage === "IO_REVIEW";
             return (
               <div
-                className="grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.7fr] md:items-center"
+                className="animate-reveal grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.7fr] md:items-center"
                 key={petition.id}
               >
                 <p className="font-mono font-semibold text-ink">{petition.petitionNumber}</p>
                 <p className="font-mono text-ink-muted">&hellip;{petition.accountNumber.slice(-4)}</p>
-                <p className="text-ink-muted">{grievanceStageLabel(petition.stage)}</p>
+                <p className="text-ink-muted">{t(grievanceStageLabel(petition.stage))}</p>
                 <div>
                   <button
-                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle disabled:opacity-50"
+                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95 disabled:opacity-50"
                     disabled={!canAdvance}
                     onClick={() => {
                       const note =
@@ -203,9 +213,14 @@ export default function AdminPage() {
                     }}
                     type="button"
                   >
-                    {grievanceActionLabel[petition.stage]}
+                    {t(grievanceActionLabel[petition.stage])}
                   </button>
-                  {confirmedGrievanceId === petition.id ? <p className="mt-1 text-sm font-medium text-teal">Updated.</p> : null}
+                  {confirmedGrievanceId === petition.id ? (
+                    <p className="animate-reveal mt-1 flex items-center gap-1 text-sm font-medium text-teal">
+                      <Icon className="h-3.5 w-3.5 animate-pop" name="check" />
+                      {t("Updated.")}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             );

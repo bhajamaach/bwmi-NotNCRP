@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { Icon } from "@/components/Icon";
+import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
 import { FieldError, PageSection, RequiredMark, buttonPrimaryClass } from "@/components/ui";
 import type { EvidenceFile } from "@/lib/types";
 
 export default function UnfreezePage() {
   const router = useRouter();
+  const { t } = useLocale();
   const { createGrievance } = useMockData();
   const [accountNumber, setAccountNumber] = useState("");
   const [reason, setReason] = useState("");
@@ -28,16 +30,18 @@ export default function UnfreezePage() {
 
   return (
     <PageSection>
-      <div>
-        <p className="font-mono text-sm font-semibold text-navy">Self-service grievance</p>
-        <h1 className="mt-1 text-3xl font-bold text-ink sm:text-4xl">Unfreeze my account</h1>
+      <div className="animate-reveal">
+        <p className="font-mono text-sm font-semibold text-navy">{t("Self-service grievance")}</p>
+        <h1 className="mt-1 text-3xl font-bold text-ink sm:text-4xl">{t("Unfreeze my account")}</h1>
         <p className="mt-2 max-w-2xl text-ink-muted">
-          If your account was frozen because it received funds later flagged as part of someone else&rsquo;s fraud case, petition here
-          instead of visiting a bank branch. You&rsquo;ll book a remote video-KYC slot yourself once this is submitted.
+          {t(
+            "If your account was frozen because it received funds later flagged as part of someone else’s fraud case, petition here instead of visiting a bank branch. You’ll book a remote video-KYC slot yourself once this is submitted."
+          )}
         </p>
       </div>
       <form
-        className="mt-6 max-w-2xl border border-line rounded-card bg-white p-5"
+        className="animate-reveal mt-6 max-w-2xl border border-line rounded-card bg-white p-5"
+        style={{ animationDelay: "70ms" }}
         noValidate
         onSubmit={(event) => {
           event.preventDefault();
@@ -52,7 +56,7 @@ export default function UnfreezePage() {
         <div className="grid gap-5">
           <div>
             <label className="block text-sm font-semibold text-ink" htmlFor="accountNumber">
-              Frozen account number<RequiredMark />
+              {t("Frozen account number")}<RequiredMark />
             </label>
             <input
               className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-3 font-mono text-ink"
@@ -66,18 +70,20 @@ export default function UnfreezePage() {
           </div>
           <div>
             <label className="block text-sm font-semibold text-ink" htmlFor="reason">
-              Why should this account be released?<RequiredMark />
+              {t("Why should this account be released?")}<RequiredMark />
             </label>
             <textarea
               className="focus-ring mt-2 min-h-28 w-full rounded-input border border-line bg-white px-3 py-3 text-ink"
               id="reason"
               onChange={(event) => setReason(event.target.value)}
-              placeholder="Example: I received this payment for a legitimate sale on a marketplace and had no involvement in the fraud complaint."
+              placeholder={t("Example: I received this payment for a legitimate sale on a marketplace and had no involvement in the fraud complaint.")}
               value={reason}
             />
             <div className="mt-1 flex justify-between gap-3 text-sm text-ink-muted">
-              <span>Minimum 30 characters.</span>
-              <span className="font-mono">{reason.trim().length}/30</span>
+              <span>{t("Minimum 30 characters.")}</span>
+              <span className={`font-mono transition-colors duration-200 ${reason.trim().length >= 30 ? "text-teal" : ""}`}>
+                {reason.trim().length}/30
+              </span>
             </div>
             <FieldError id="reason-error">{errors.reason}</FieldError>
           </div>
@@ -87,7 +93,7 @@ export default function UnfreezePage() {
           </div>
           <button className={buttonPrimaryClass} disabled={!isValid || isSubmitting} type="submit">
             <Icon className="h-4 w-4" name="unlock" />
-            {isSubmitting ? "Submitting..." : "Submit petition"}
+            {isSubmitting ? t("Submitting...") : t("Submit petition")}
           </button>
         </div>
       </form>

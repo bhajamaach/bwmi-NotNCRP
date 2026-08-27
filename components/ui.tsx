@@ -9,10 +9,10 @@ export function PageSection({ children, className = "" }: { children: React.Reac
 }
 
 const buttonBase =
-  "focus-ring inline-flex items-center justify-center gap-2 rounded-control border px-5 py-3 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "focus-ring inline-flex items-center justify-center gap-2 rounded-control border px-5 py-3 font-medium transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
 
-export const buttonPrimaryClass = `${buttonBase} border-navy bg-navy text-white hover:bg-navy-hover`;
-export const buttonSecondaryClass = `${buttonBase} border-line bg-white text-navy hover:bg-bg-subtle`;
+export const buttonPrimaryClass = `${buttonBase} border-navy bg-navy text-white hover:bg-navy-hover hover:shadow-md`;
+export const buttonSecondaryClass = `${buttonBase} border-line bg-white text-navy hover:bg-bg-subtle hover:border-line-strong`;
 
 /**
  * Shared "formal choice list" pattern (landing A/B/C, CategoryQA top-level and
@@ -20,7 +20,7 @@ export const buttonSecondaryClass = `${buttonBase} border-line bg-white text-nav
  */
 export const choiceListClass = "divide-y divide-line rounded-card border border-line bg-white";
 export const choiceRowClass =
-  "group focus-ring flex w-full items-start gap-3 border-2 border-transparent text-left transition-colors hover:border-navy hover:bg-bg-subtle";
+  "group focus-ring flex w-full items-start gap-3 border-2 border-transparent text-left transition-all duration-150 hover:border-navy hover:bg-bg-subtle active:scale-[0.995]";
 export const choiceRowSelectedClass = "border-navy bg-bg-subtle";
 
 export function ChoiceLetter({
@@ -36,10 +36,10 @@ export function ChoiceLetter({
   return (
     <span
       aria-hidden
-      className={`flex shrink-0 items-center justify-center rounded-full border font-mono font-bold ${sizeClass} ${
+      className={`flex shrink-0 items-center justify-center rounded-full border font-mono font-bold transition-all duration-150 ${sizeClass} ${
         active
           ? "border-navy bg-navy text-white"
-          : "border-line-strong bg-white text-ink group-hover:border-navy group-hover:bg-navy group-hover:text-white"
+          : "border-line-strong bg-white text-ink group-hover:border-navy group-hover:bg-navy group-hover:text-white group-hover:scale-110"
       }`}
     >
       {letter}
@@ -80,7 +80,7 @@ export function SecondaryLink({ href, children, className = "" }: { href: string
 export function FieldError({ id, children }: { id: string; children?: string }) {
   if (!children) return null;
   return (
-    <p className="mt-2 flex items-start gap-1.5 text-sm font-medium text-error" id={id} role="alert">
+    <p className="animate-reveal mt-2 flex items-start gap-1.5 text-sm font-medium text-error" id={id} role="alert">
       <Icon className="mt-0.5 h-4 w-4 shrink-0" name="alert" />
       <span>{children}</span>
     </p>
@@ -104,7 +104,9 @@ export function CopyButton({ value, className = "" }: { value: string; className
 
   return (
     <button
-      className={`focus-ring rounded-control border border-line px-3 py-1.5 text-sm font-semibold text-navy hover:bg-bg-subtle ${className}`}
+      className={`focus-ring inline-flex items-center gap-1.5 rounded-control border px-3 py-1.5 text-sm font-semibold transition-all duration-150 active:scale-95 ${
+        copied ? "border-teal bg-bg-subtle text-teal" : "border-line text-navy hover:bg-bg-subtle"
+      } ${className}`}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -116,7 +118,16 @@ export function CopyButton({ value, className = "" }: { value: string; className
       }}
       type="button"
     >
-      {copied ? "Copied" : "Copy"}
+      {copied ? (
+        <>
+          <Icon className="h-3.5 w-3.5 animate-pop" name="check" />
+          <span key="copied" className="animate-reveal">
+            Copied
+          </span>
+        </>
+      ) : (
+        "Copy"
+      )}
     </button>
   );
 }

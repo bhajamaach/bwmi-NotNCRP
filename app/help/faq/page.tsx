@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/LocaleProvider";
 import { PageSection } from "@/components/ui";
 
 const faqs = [
@@ -24,15 +27,18 @@ const faqs = [
 ];
 
 export default function FaqPage() {
+  const { t } = useLocale();
   return (
     <PageSection className="max-w-3xl">
-      <p className="text-sm font-medium text-navy">Resources</p>
-      <h1 className="mt-2 text-3xl font-bold text-ink">Frequently asked questions</h1>
-      <div className="mt-6 divide-y divide-line rounded-card border border-line bg-white">
+      <div className="animate-reveal">
+        <p className="text-sm font-medium text-navy">{t("Resources")}</p>
+        <h1 className="mt-2 text-3xl font-bold text-ink">{t("Frequently asked questions")}</h1>
+      </div>
+      <div className="animate-reveal mt-6 divide-y divide-line rounded-card border border-line bg-white" style={{ animationDelay: "70ms" }}>
         {faqs.map((item) => (
           <details className="group p-5" key={item.q}>
-            <summary className="focus-ring cursor-pointer list-none font-semibold text-ink">{item.q}</summary>
-            <p className="mt-2 text-sm text-ink-muted">{item.a}</p>
+            <summary className="focus-ring cursor-pointer list-none font-semibold text-ink">{t(item.q)}</summary>
+            <p className="mt-2 text-sm text-ink-muted">{t(item.a)}</p>
           </details>
         ))}
       </div>

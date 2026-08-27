@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CallButton } from "@/components/CallButton";
 import { Icon } from "@/components/Icon";
+import { useLocale } from "@/components/LocaleProvider";
 import { bankDirectory, nationalHelplineFor } from "@/lib/bank-directory";
 import { lookupIfsc, type BankBranch } from "@/lib/ifsc";
 
@@ -17,6 +18,7 @@ export function ChecklistCard({
   transactionId: string;
   onTransactionIdChange: (value: string) => void;
 }) {
+  const { t } = useLocale();
   const [called, setCalled] = useState(false);
   const [mode, setMode] = useState<LookupMode>("ifsc");
   const [ifsc, setIfsc] = useState("");
@@ -45,23 +47,25 @@ export function ChecklistCard({
 
   return (
     <aside className="border border-line rounded-card bg-white p-5">
-      <h2 className="text-lg font-bold text-ink">Do these in parallel</h2>
-      <p className="mt-1 text-sm text-ink-muted">This app doesn't place calls or contact anyone for you — these are the actions to take yourself, right now.</p>
+      <h2 className="text-lg font-bold text-ink">{t("Do these in parallel")}</h2>
+      <p className="mt-1 text-sm text-ink-muted">
+        {t("This app doesn't place calls or contact anyone for you — these are the actions to take yourself, right now.")}
+      </p>
       <div className="mt-5 space-y-4">
         <div className="border border-line rounded-control p-4">
           <div className="flex items-start gap-3">
             <Icon className="mt-1 h-5 w-5 text-navy" name={called ? "check" : "phone"} />
             <div className="min-w-0 flex-1">
-              <h3 className={`font-semibold transition-colors duration-200 ${called ? "text-ink-muted line-through" : "text-ink"}`}>Call 1930</h3>
-              <p className="text-sm text-ink-muted">India&rsquo;s national cyber fraud helpline.</p>
+              <h3 className={`font-semibold transition-colors duration-200 ${called ? "text-ink-muted line-through" : "text-ink"}`}>{t("Call 1930")}</h3>
+              <p className="text-sm text-ink-muted">{t("India’s national cyber fraud helpline.")}</p>
               <div className="mt-3 flex items-center gap-2">
-                <CallButton label="Call 1930" number="1930" />
+                <CallButton label={t("Call 1930")} number="1930" />
                 <button
-                  className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle"
+                  className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95"
                   onClick={() => setCalled(true)}
                   type="button"
                 >
-                  {called ? "Marked called" : "Mark call attempted"}
+                  {called ? t("Marked called") : t("Mark call attempted")}
                 </button>
               </div>
             </div>
@@ -71,7 +75,7 @@ export function ChecklistCard({
           <div className="flex items-start gap-3">
             <Icon className="mt-1 h-5 w-5 text-navy" name={contacted ? "check" : "bank"} />
             <div className="min-w-0 flex-1">
-              <h3 className={`font-semibold transition-colors duration-200 ${contacted ? "text-ink-muted line-through" : "text-ink"}`}>Contact your bank</h3>
+              <h3 className={`font-semibold transition-colors duration-200 ${contacted ? "text-ink-muted line-through" : "text-ink"}`}>{t("Contact your bank")}</h3>
 
               <div className="mt-2 flex gap-1 rounded-control border border-line bg-bg-subtle p-1 text-sm">
                 <button
@@ -79,21 +83,21 @@ export function ChecklistCard({
                   onClick={() => setMode("ifsc")}
                   type="button"
                 >
-                  I know my IFSC
+                  {t("I know my IFSC")}
                 </button>
                 <button
                   className={`flex-1 rounded-input px-2 py-1.5 font-semibold transition-colors ${mode === "name" ? "bg-white text-navy shadow-sm" : "text-ink-muted"}`}
                   onClick={() => setMode("name")}
                   type="button"
                 >
-                  Just my bank name
+                  {t("Just my bank name")}
                 </button>
               </div>
 
               {mode === "ifsc" ? (
-                <div className="mt-3">
+                <div className="animate-reveal mt-3">
                   <label className="block text-sm text-ink-muted" htmlFor="bankLookup">
-                    Look up the receiving branch by IFSC code
+                    {t("Look up the receiving branch by IFSC code")}
                   </label>
                   <div className="mt-1 flex flex-col gap-2 sm:flex-row">
                     <input
@@ -111,12 +115,12 @@ export function ChecklistCard({
                       value={ifsc}
                     />
                     <button
-                      className="focus-ring shrink-0 rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle disabled:opacity-50"
+                      className="focus-ring shrink-0 rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95 disabled:opacity-50"
                       disabled={isLookingUp || !ifsc.trim()}
                       onClick={() => runLookup(ifsc)}
                       type="button"
                     >
-                      {isLookingUp ? "Looking up…" : "Look up"}
+                      {isLookingUp ? t("Looking up…") : t("Look up")}
                     </button>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -133,7 +137,7 @@ export function ChecklistCard({
                   </div>
                   {lookupError ? <p className="mt-2 text-sm font-medium text-error">{lookupError}</p> : null}
                   {branch ? (
-                    <div className="mt-3 flex items-start justify-between gap-3 border border-line rounded-input bg-white p-3">
+                    <div className="animate-reveal mt-3 flex items-start justify-between gap-3 border border-line rounded-input bg-white p-3">
                       <div className="min-w-0">
                         <p className="font-semibold text-ink">{branch.bankName}</p>
                         <p className="text-sm text-ink-muted">
@@ -161,9 +165,9 @@ export function ChecklistCard({
                   ) : null}
                 </div>
               ) : (
-                <div className="mt-3">
+                <div className="animate-reveal mt-3">
                   <label className="block text-sm text-ink-muted" htmlFor="bankPicker">
-                    Which bank is this?
+                    {t("Which bank is this?")}
                   </label>
                   <select
                     className="focus-ring mt-1 w-full rounded-input border border-line bg-white px-3 py-2 text-ink"
@@ -171,7 +175,7 @@ export function ChecklistCard({
                     onChange={(event) => setPickedBankCode(event.target.value)}
                     value={pickedBankCode}
                   >
-                    <option value="">Select a bank</option>
+                    <option value="">{t("Select a bank")}</option>
                     {bankDirectory.map((entry) => (
                       <option key={entry.code} value={entry.code}>
                         {entry.name}
@@ -179,7 +183,7 @@ export function ChecklistCard({
                     ))}
                   </select>
                   {pickedBank ? (
-                    <div className="mt-3 flex items-start justify-between gap-3 border border-line rounded-input bg-white p-3">
+                    <div className="animate-reveal mt-3 flex items-start justify-between gap-3 border border-line rounded-input bg-white p-3">
                       <div className="min-w-0">
                         <p className="font-semibold text-ink">{pickedBank.name}</p>
                         {pickedBank.helpline ? (
@@ -200,11 +204,11 @@ export function ChecklistCard({
               )}
 
               <button
-                className="focus-ring mt-3 rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy hover:bg-bg-subtle"
+                className="focus-ring mt-3 rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95"
                 onClick={() => setContacted(true)}
                 type="button"
               >
-                {contacted ? "Marked contacted" : "Mark bank contacted"}
+                {contacted ? t("Marked contacted") : t("Mark bank contacted")}
               </button>
             </div>
           </div>
@@ -217,13 +221,13 @@ export function ChecklistCard({
                 className={`font-semibold transition-colors duration-200 ${transactionId ? "text-ink-muted line-through" : "text-ink"}`}
                 htmlFor="checklistTransactionId"
               >
-                Keep transaction ID / UTR ready
+                {t("Keep transaction ID / UTR ready")}
               </label>
               <input
                 className="focus-ring mt-2 w-full rounded-input border border-line bg-white px-3 py-2 font-mono text-ink"
                 id="checklistTransactionId"
                 onChange={(event) => onTransactionIdChange(event.target.value)}
-                placeholder="Type once; form uses it"
+                placeholder={t("Type once; form uses it")}
                 value={transactionId}
               />
             </div>
