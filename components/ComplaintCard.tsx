@@ -14,7 +14,7 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
   return (
     <Link
       className={`focus-ring block border border-line border-l-4 ${accentClass} rounded-card bg-white p-5 hover:border-navy`}
-      href={`/track/view?id=${complaint.id}`}
+      href={`/track/${complaint.id}`}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>

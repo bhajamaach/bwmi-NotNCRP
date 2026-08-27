@@ -45,7 +45,7 @@ export default function UnfreezePage() {
           setIsSubmitting(true);
           window.setTimeout(() => {
             const petition = createGrievance({ accountNumber: accountNumber.trim(), reason: reason.trim(), evidence });
-            router.push(`/unfreeze/view?id=${petition.id}`);
+            router.push(`/unfreeze/${petition.id}`);
           }, 500);
         }}
       >
