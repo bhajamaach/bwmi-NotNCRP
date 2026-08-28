@@ -154,7 +154,7 @@ export default function AdminPage() {
                     className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95 disabled:opacity-50"
                     disabled={complaint.status === "RESOLVED"}
                     onClick={() => {
-                      updateStatus(complaint.id, target, `The cyber cell updated the status to ${statusLabel(target)}.`);
+                      updateStatus(complaint.id, target, `The cyber cell updated the status to ${statusLabel(target)}.`).catch(() => {});
                       setConfirmedId(complaint.id);
                       window.setTimeout(() => setConfirmedId(null), 1500);
                     }}
@@ -213,7 +213,7 @@ export default function AdminPage() {
                         petition.stage === "KYC_SCHEDULED"
                           ? "The investigating officer completed the video-KYC review."
                           : "The investigating officer approved the petition and issued a digital NOC to the bank.";
-                      advanceGrievance(petition.id, note);
+                      advanceGrievance(petition.id, note).catch(() => {});
                       setConfirmedGrievanceId(petition.id);
                       window.setTimeout(() => setConfirmedGrievanceId(null), 1500);
                     }}

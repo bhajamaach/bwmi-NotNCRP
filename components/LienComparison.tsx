@@ -7,7 +7,7 @@ export function LienComparison({ complaint }: { complaint: Complaint }) {
   const untouched = complaint.accountBalanceAtRisk - complaint.lienAmount;
 
   return (
-    <div className="border border-line rounded-card bg-white p-5">
+    <div className="border-2 border-line-bold rounded-card bg-white p-5">
       <h2 className="font-bold text-ink">Financial lien</h2>
       <p className="mt-1 text-sm text-ink-muted">
         Only the disputed amount is held, instead of freezing the whole receiving account.
@@ -15,21 +15,24 @@ export function LienComparison({ complaint }: { complaint: Complaint }) {
       <div className="mt-4 grid gap-3">
         <div className="border border-line-strong border-dashed rounded-control p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">A blanket freeze would have held</p>
-          <div className="mt-2 h-7 w-full overflow-hidden rounded-input bg-bg-subtle">
-            <div className="flex h-full items-center bg-urgent px-2 font-mono text-xs font-semibold text-white" style={{ width: "100%" }}>
-              Rs. {complaint.accountBalanceAtRisk.toLocaleString("en-IN")} frozen
+          <div className="mt-2 flex items-center gap-2">
+            <div className="h-7 flex-1 overflow-hidden rounded-input bg-bg-subtle">
+              <div className="h-full bg-urgent" style={{ width: "100%" }} />
             </div>
+            <span className="shrink-0 font-mono text-xs font-semibold text-ink">
+              Rs. {complaint.accountBalanceAtRisk.toLocaleString("en-IN")} frozen
+            </span>
           </div>
         </div>
         <div className="border border-line-bold rounded-control p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-teal">What actually happened here</p>
-          <div className="mt-2 h-7 w-full overflow-hidden rounded-input bg-bg-subtle">
-            <div
-              className="flex h-full items-center bg-navy px-2 font-mono text-xs font-semibold text-white"
-              style={{ width: `${lienShare}%` }}
-            >
-              Rs. {complaint.lienAmount.toLocaleString("en-IN")}
+          <div className="mt-2 flex items-center gap-2">
+            <div className="h-7 flex-1 overflow-hidden rounded-input bg-bg-subtle">
+              <div className="h-full bg-navy" style={{ width: `${lienShare}%` }} />
             </div>
+            <span className="shrink-0 font-mono text-xs font-semibold text-ink">
+              Rs. {complaint.lienAmount.toLocaleString("en-IN")}
+            </span>
           </div>
           <p className="mt-2 text-sm text-ink-muted">
             Only the disputed amount is held. Rs. {untouched.toLocaleString("en-IN")} of the receiving account stays usable by its holder

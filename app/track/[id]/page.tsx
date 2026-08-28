@@ -42,7 +42,7 @@ export default function ComplaintDetailPage() {
   function handleAddNote() {
     const trimmed = noteText.trim();
     if (!trimmed) return;
-    addCitizenNote(complaint!.id, trimmed);
+    addCitizenNote(complaint!.id, trimmed).catch(() => {});
     setNoteText("");
     setNoteConfirmed(true);
     window.setTimeout(() => setNoteConfirmed(false), 2000);

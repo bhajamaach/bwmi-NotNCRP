@@ -58,7 +58,7 @@ export default function GrievanceDetailPage() {
                   <button
                     className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95"
                     key={slot}
-                    onClick={() => scheduleKycSlot(petition.id, slot)}
+                    onClick={() => scheduleKycSlot(petition.id, slot).catch(() => {})}
                     type="button"
                   >
                     {slot}

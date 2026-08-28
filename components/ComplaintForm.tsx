@@ -75,18 +75,22 @@ export function ComplaintForm({
     <form
       className="border-2 border-line-bold rounded-card bg-white p-5"
       noValidate
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault();
         setSubmitError("");
         if (!isValid || isSubmitting) return;
         setIsSubmitting(true);
-        window.setTimeout(() => {
-          if (description.toLowerCase().includes("simulate error")) {
+
+        if (description.toLowerCase().includes("simulate error")) {
+          window.setTimeout(() => {
             setSubmitError("We couldn't save this complaint. Please try submitting again.");
             setIsSubmitting(false);
-            return;
-          }
-          const complaint = createComplaint({
+          }, 650);
+          return;
+        }
+
+        try {
+          const complaint = await createComplaint({
             category: effectiveCategory,
             subCategory: selectedSubCategory,
             isUrgent,
@@ -99,7 +103,10 @@ export function ComplaintForm({
           });
           window.sessionStorage.setItem("last-ack", complaint.ackNumber);
           router.push(isUrgent ? `/track/${complaint.id}` : `/report/confirm?id=${complaint.id}`);
-        }, 650);
+        } catch {
+          setSubmitError("We couldn't reach the tracking service. Please check your connection and try again.");
+          setIsSubmitting(false);
+        }
       }}
     >
       <div className="border-b border-line pb-4">

@@ -5,7 +5,7 @@ export function FundRestorationCard({ complaint }: { complaint: Complaint }) {
   if (!complaint.lienAmount || complaint.status !== "RESOLVED") return null;
 
   return (
-    <div className="flex items-start gap-3 border border-line border-l-4 border-l-teal rounded-card bg-white p-5">
+    <div className="flex items-start gap-3 border-2 border-line-bold border-l-4 border-l-teal rounded-card bg-white p-5">
       <Icon className="mt-0.5 h-5 w-5 shrink-0 text-teal" name="unlock" />
       <div>
         <h2 className="font-bold text-teal">Funds restored</h2>

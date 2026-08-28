@@ -1,22 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
 import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
 import { FieldError, PageSection, buttonPrimaryClass } from "@/components/ui";
-import { demoUsers } from "@/lib/seed-data";
 import { findDemoUserByMobile, isValidDemoMobile, isValidOtp } from "@/lib/mock-auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginAs } = useMockData();
+  const { demoUsers, loginAs } = useMockData();
   const { t } = useLocale();
-  const [mobile, setMobile] = useState(demoUsers[0].mobile);
+  const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"mobile" | "otp">("mobile");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!mobile && demoUsers[0]) setMobile(demoUsers[0].mobile);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoUsers]);
 
   return (
     <PageSection>
@@ -38,7 +42,7 @@ export default function LoginPage() {
             event.preventDefault();
             setError("");
             if (step === "mobile") {
-              if (!isValidDemoMobile(mobile)) {
+              if (!isValidDemoMobile(demoUsers, mobile)) {
                 setError(t("Enter one of the sample mobile numbers above."));
                 return;
               }
@@ -49,7 +53,7 @@ export default function LoginPage() {
               setError(t("Enter any six-digit code."));
               return;
             }
-            const user = findDemoUserByMobile(mobile);
+            const user = findDemoUserByMobile(demoUsers, mobile);
             if (user) loginAs(user.id);
             router.push("/track");
           }}
@@ -90,8 +94,8 @@ export default function LoginPage() {
           <button
             className="focus-ring mt-3 inline-flex items-center gap-2 rounded-control border border-line px-4 py-2 font-semibold text-navy hover:bg-bg-subtle"
             onClick={() => {
-              const user = findDemoUserByMobile(mobile) ?? demoUsers[0];
-              loginAs(user.id);
+              const user = findDemoUserByMobile(demoUsers, mobile) ?? demoUsers[0];
+              if (user) loginAs(user.id);
               router.push("/track");
             }}
             type="button"

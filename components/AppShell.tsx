@@ -13,7 +13,7 @@ const navyBarButtonClass =
   "focus-ring-invert inline-flex items-center justify-center gap-2 rounded-control border-2 border-white px-4 py-2 font-semibold text-white transition-colors hover:bg-white hover:text-navy";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { currentUser, logout } = useMockData();
+  const { currentUser, logout, loadError, retryLoad } = useMockData();
   const { t } = useLocale();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -108,6 +108,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+      {loadError ? (
+        <div className="border-b-2 border-amber bg-bg-subtle px-4 py-2 text-center text-sm font-semibold text-amber sm:px-6">
+          {t(loadError)}{" "}
+          <button className="focus-ring underline underline-offset-2" onClick={retryLoad} type="button">
+            {t("Retry")}
+          </button>
+        </div>
+      ) : null}
       <main className="flex-1">{children}</main>
       <footer className="border-t border-line bg-bg-subtle">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -144,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <summary className="focus-ring cursor-pointer list-none hover:text-navy">{t("How this works")}</summary>
                     <p className="mt-2 max-w-xs text-ink-muted">
                       {t(
-                        "Login, bank contact, 1930, evidence review, and fund liens run against a local session rather than live banking or government systems. Evidence fingerprints are real SHA-256 hashes, computed in your browser. Hindi coverage is deliberately scoped to the screens where translation accuracy matters most."
+                        "Complaints and grievance petitions are stored on a real backend, so status is genuinely visible across devices and to the Cyber Cell dashboard. Login, bank contact, 1930, and fund liens are still simulated rather than connected to live banking or government systems. Evidence fingerprints are real SHA-256 hashes, computed in your browser. Hindi coverage is deliberately scoped to the screens where translation accuracy matters most."
                       )}
                     </p>
                   </details>

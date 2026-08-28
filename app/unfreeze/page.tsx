@@ -17,6 +17,7 @@ export default function UnfreezePage() {
   const [reason, setReason] = useState("");
   const [evidence, setEvidence] = useState<EvidenceFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const errors = useMemo(() => {
     const next: Record<string, string> = {};
@@ -40,17 +41,21 @@ export default function UnfreezePage() {
         </p>
       </div>
       <form
-        className="animate-reveal mt-6 max-w-2xl border border-line rounded-card bg-white p-5"
+        className="animate-reveal mt-6 max-w-2xl border-2 border-line-bold rounded-card bg-white p-5"
         style={{ animationDelay: "70ms" }}
         noValidate
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
+          setSubmitError("");
           if (!isValid || isSubmitting) return;
           setIsSubmitting(true);
-          window.setTimeout(() => {
-            const petition = createGrievance({ accountNumber: accountNumber.trim(), reason: reason.trim(), evidence });
+          try {
+            const petition = await createGrievance({ accountNumber: accountNumber.trim(), reason: reason.trim(), evidence });
             router.push(`/unfreeze/${petition.id}`);
-          }, 500);
+          } catch {
+            setSubmitError("We couldn't reach the tracking service. Please check your connection and try again.");
+            setIsSubmitting(false);
+          }
         }}
       >
         <div className="grid gap-5">
@@ -91,6 +96,7 @@ export default function UnfreezePage() {
             <EvidenceUpload files={evidence} onChange={setEvidence} />
             <FieldError id="evidence-error">{errors.evidence}</FieldError>
           </div>
+          <FieldError id="submit-error">{submitError}</FieldError>
           <button className={buttonPrimaryClass} disabled={!isValid || isSubmitting} type="submit">
             <Icon className="h-4 w-4" name="unlock" />
             {isSubmitting ? t("Submitting...") : t("Submit petition")}

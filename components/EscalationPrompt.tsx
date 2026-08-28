@@ -56,7 +56,7 @@ export function EscalationPrompt({ complaint }: { complaint: Complaint }) {
             className={`${buttonPrimaryClass} mt-4 disabled:active:translate-y-0`}
             disabled={complaint.escalated}
             onClick={() => {
-              markEscalated(complaint.id);
+              markEscalated(complaint.id).catch(() => {});
               setConfirmed(true);
               window.setTimeout(() => setConfirmed(false), 1500);
             }}
