@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { api, isApiConfigured } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import { demoUsers as fallbackDemoUsers, seededComplaints, seededGrievances } from "@/lib/seed-data";
 import type {
   Complaint,
@@ -53,18 +53,6 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
 
     async function load() {
       setIsLoaded(false);
-      if (!isApiConfigured()) {
-        // No backend configured (e.g. a local build without NEXT_PUBLIC_API_URL) —
-        // fall back to the bundled seed data so the app still boots, and say so.
-        if (!cancelled) {
-          setComplaints(seededComplaints);
-          setGrievances(seededGrievances);
-          setDemoUsers(fallbackDemoUsers);
-          setLoadError("No API configured — showing local seed data only.");
-          setIsLoaded(true);
-        }
-        return;
-      }
       try {
         const [users, fetchedComplaints, fetchedGrievances] = await Promise.all([
           api.getUsers(),
@@ -113,7 +101,6 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
         window.localStorage.removeItem(SESSION_STORAGE_KEY);
       },
       createComplaint: async (draft) => {
-        if (!isApiConfigured()) throw new Error("Complaint creation requires a configured backend.");
         const complaint = await api.createComplaint(draft, currentUser?.id ?? "user-demo-active");
         setComplaints((items) => [complaint, ...items]);
         return complaint;

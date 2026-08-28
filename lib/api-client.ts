@@ -1,14 +1,7 @@
 import type { Complaint, ComplaintDraft, ComplaintStatus, DemoUser, EvidenceFile, GrievancePetition } from "@/lib/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-export function isApiConfigured() {
-  return Boolean(API_URL);
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL is not configured");
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(path, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers }
   });
