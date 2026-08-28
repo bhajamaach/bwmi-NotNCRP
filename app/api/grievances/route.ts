@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool, ready } from "@/lib/db.server";
+import { persistEvidence } from "@/lib/evidence.server";
 import { generatePetitionNumber } from "@/lib/grievance";
 import { generateGrievanceId } from "@/lib/ids";
 import type { EvidenceFile, GrievancePetition } from "@/lib/types";
@@ -18,14 +19,16 @@ export async function POST(request: NextRequest) {
   const body = (await request.json()) as { accountNumber: string; reason: string; evidence: EvidenceFile[]; requestedUserId?: string };
   const createdAt = new Date();
   const userId = body.requestedUserId ?? "user-demo-active";
+  const petitionId = generateGrievanceId();
+  const evidence = await persistEvidence("grievance", petitionId, body.evidence ?? []);
 
   const petition: GrievancePetition = {
-    id: generateGrievanceId(),
+    id: petitionId,
     petitionNumber: generatePetitionNumber(),
     userId,
     accountNumber: body.accountNumber,
     reason: body.reason,
-    evidence: body.evidence ?? [],
+    evidence,
     stage: "SUBMITTED",
     createdAt: createdAt.toISOString(),
     stageHistory: [

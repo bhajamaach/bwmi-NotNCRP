@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { EvidenceList } from "@/components/EvidenceList";
 import { GrievanceTimeline } from "@/components/GrievanceTimeline";
 import { Icon } from "@/components/Icon";
 import { useLocale } from "@/components/LocaleProvider";
@@ -101,21 +102,7 @@ export default function GrievanceDetailPage() {
           ) : null}
           <div className="border border-line rounded-card bg-white p-5">
             <h2 className="font-bold text-ink">{t("Evidence submitted")}</h2>
-            <ul className="mt-2 space-y-1.5 text-sm text-ink-muted">
-              {petition.evidence.map((file) => (
-                <li className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5" key={`${file.name}-${file.size}`}>
-                  <span className="flex items-center gap-2">
-                    <Icon className="h-4 w-4 text-navy" name="file" />
-                    {file.name}
-                  </span>
-                  {file.hash ? (
-                    <span className="font-mono text-xs text-teal" title={`SHA-256: ${file.hash}`}>
-                      SHA-256 {file.hash.slice(0, 12)}&hellip;
-                    </span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+            <EvidenceList files={petition.evidence} />
           </div>
         </aside>
       </div>

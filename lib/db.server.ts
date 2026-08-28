@@ -46,6 +46,26 @@ CREATE TABLE IF NOT EXISTS grievances (
   data JSONB NOT NULL
 );
 CREATE INDEX IF NOT EXISTS grievances_user_id_idx ON grievances (user_id);
+
+-- File content lives here, not inline in complaints/grievances' JSONB data —
+-- otherwise every small mutation (a chat message, a status change) rewrites
+-- whatever images were attached, which is slow and wastes storage/compute.
+-- The JSONB "evidence" array on a complaint/grievance only ever holds
+-- lightweight metadata ({id, name, size, type, hash, hashedAt}) referencing
+-- a row here by id.
+CREATE TABLE IF NOT EXISTS evidence (
+  id TEXT PRIMARY KEY,
+  owner_type TEXT NOT NULL CHECK (owner_type IN ('complaint', 'grievance')),
+  owner_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  type TEXT NOT NULL,
+  hash TEXT,
+  hashed_at TIMESTAMPTZ,
+  data BYTEA NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS evidence_owner_idx ON evidence (owner_type, owner_id);
 `;
 
 let readyPromise: Promise<void> | null = null;

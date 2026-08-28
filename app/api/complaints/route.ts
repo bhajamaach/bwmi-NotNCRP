@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool, ready } from "@/lib/db.server";
+import { persistEvidence } from "@/lib/evidence.server";
 import { generateAckNumber, generateComplaintId } from "@/lib/ids";
 import { buildSlaDeadline } from "@/lib/sla-config";
 import type { Complaint, ComplaintDraft } from "@/lib/types";
@@ -26,9 +27,11 @@ export async function POST(request: NextRequest) {
   const createdAt = new Date();
   const userId = draft.isAnonymous ? "anonymous" : draft.requestedUserId ?? "user-demo-active";
   const isFinancialLien = draft.isUrgent && typeof draft.amount === "number" && draft.amount > 0;
+  const complaintId = generateComplaintId();
+  const evidence = await persistEvidence("complaint", complaintId, draft.evidence ?? []);
 
   const complaint: Complaint = {
-    id: generateComplaintId(),
+    id: complaintId,
     ackNumber: generateAckNumber(),
     userId,
     category: draft.category,
@@ -38,7 +41,7 @@ export async function POST(request: NextRequest) {
     incidentAt: draft.incidentAt,
     amount: draft.amount,
     transactionId: draft.transactionId,
-    evidence: draft.evidence,
+    evidence,
     status: "RECEIVED",
     statusHistory: [
       {

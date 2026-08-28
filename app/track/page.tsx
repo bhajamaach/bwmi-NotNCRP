@@ -28,9 +28,13 @@ export default function TrackPage() {
         <div className="animate-reveal border-2 border-line-bold rounded-card bg-white p-6">
           <h1 className="text-2xl font-bold text-ink">{t("Login to view complaints")}</h1>
           <p className="mt-2 text-ink-muted">{t("Reporting is open to anyone, but tracking your complaints requires signing in.")}</p>
-          <div className="mt-5">
+          <div className="mt-5 flex flex-wrap gap-3">
             <PrimaryLink href="/login">{t("Login")}</PrimaryLink>
+            <SecondaryLink href="/track/lookup">{t("Find an anonymous report")}</SecondaryLink>
           </div>
+          <p className="mt-4 text-sm text-ink-muted">
+            {t("Filed anonymously? That report was never tied to an account, so it won't show up here even after logging in — look it up by acknowledgement number instead.")}
+          </p>
         </div>
       </PageSection>
     );

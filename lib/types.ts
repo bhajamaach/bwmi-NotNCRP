@@ -19,11 +19,15 @@ export interface ThreadMessage {
 }
 
 export interface EvidenceFile {
+  /** Assigned by the server once the file is actually stored — absent for a not-yet-submitted draft. */
+  id?: string;
   name: string;
   size: number;
   type: string;
   hash?: string;
   hashedAt?: string;
+  /** Base64 data URI of the file content — only ever present client-side before submission. The API never returns this; fetch /api/evidence/[id] for the actual bytes instead. */
+  dataUrl?: string;
 }
 
 export interface Complaint {

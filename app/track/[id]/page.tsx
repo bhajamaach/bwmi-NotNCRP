@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { ComplaintThread } from "@/components/ComplaintThread";
 import { EscalationPrompt } from "@/components/EscalationPrompt";
+import { EvidenceList } from "@/components/EvidenceList";
 import { FundRestorationCard } from "@/components/FundRestorationCard";
 import { Icon } from "@/components/Icon";
 import { LienComparison } from "@/components/LienComparison";
@@ -196,21 +197,7 @@ export default function ComplaintDetailPage() {
             {complaint.evidence?.length ? (
               <div className="mt-4">
                 <h3 className="text-sm font-semibold text-ink">Evidence selected</h3>
-                <ul className="mt-2 space-y-1.5 text-sm text-ink-muted">
-                  {complaint.evidence.map((file) => (
-                    <li className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5" key={`${file.name}-${file.size}`}>
-                      <span className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-navy" name="file" />
-                        {file.name}
-                      </span>
-                      {file.hash ? (
-                        <span className="font-mono text-xs text-teal" title={`SHA-256: ${file.hash}`}>
-                          SHA-256 {file.hash.slice(0, 12)}&hellip;
-                        </span>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
+                <EvidenceList files={complaint.evidence} />
               </div>
             ) : null}
           </div>

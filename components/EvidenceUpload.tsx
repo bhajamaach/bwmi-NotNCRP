@@ -6,7 +6,12 @@ import { extractText, findLikelyReference } from "@/lib/ocr";
 import type { EvidenceFile } from "@/lib/types";
 
 const acceptedTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
-const maxFileSize = 5 * 1024 * 1024;
+// Evidence content is stored as a base64 data URI in the complaint record so
+// it can actually be reopened later, not just fingerprinted. Base64 inflates
+// size by ~33%, and the whole request has to stay under Vercel's fixed 4.5MB
+// function payload limit — these caps keep real-world usage well inside that.
+const maxFileSize = 2 * 1024 * 1024;
+const maxTotalSize = 3 * 1024 * 1024;
 
 function fileKey(file: { name: string; size: number }) {
   return `${file.name}-${file.size}`;
@@ -20,13 +25,22 @@ async function sha256Hex(file: File) {
     .join("");
 }
 
+function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
 export function EvidenceUpload({
   files,
   onChange,
   onDetectedReference
 }: {
   files: EvidenceFile[];
-  onChange: (files: EvidenceFile[]) => void;
+  onChange: (files: EvidenceFile[] | ((prev: EvidenceFile[]) => EvidenceFile[])) => void;
   /** Called when OCR finds a likely transaction reference in an uploaded image. */
   onDetectedReference?: (value: string) => void;
 }) {
@@ -49,7 +63,14 @@ export function EvidenceUpload({
     setError("");
     const invalid = selected.find((file) => !acceptedTypes.includes(file.type) || file.size > maxFileSize);
     if (invalid) {
-      setError("Upload images or PDFs only, up to 5 MB each.");
+      setError("Upload images or PDFs only, up to 2 MB each.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+    const currentTotal = files.reduce((sum, file) => sum + file.size, 0);
+    const addedTotal = selected.reduce((sum, file) => sum + file.size, 0);
+    if (currentTotal + addedTotal > maxTotalSize) {
+      setError(`Evidence for one complaint is capped at ${Math.round(maxTotalSize / 1024 / 1024)} MB combined.`);
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
@@ -73,17 +94,31 @@ export function EvidenceUpload({
     onChange(merged);
     if (inputRef.current) inputRef.current.value = "";
 
-    // Fingerprint each newly added file in the background — a genuine SHA-256 of the
-    // file bytes, computed entirely in the browser, then attached once ready.
+    // Fingerprint and read each newly added file in the background. These two
+    // async updates land independently and out of order, so both use the
+    // functional setState form — mapping over whatever the latest array is
+    // at update time — instead of the stale `merged` snapshot, or whichever
+    // one finishes second would silently overwrite the other's field.
     newlyAdded.forEach((file) => {
       const key = fileKey(file);
       sha256Hex(file)
         .then((hash) => {
           const hashedAt = new Date().toISOString();
-          onChange(merged.map((item) => (fileKey(item) === key ? { ...item, hash, hashedAt } : item)));
+          onChange((prev) => prev.map((item) => (fileKey(item) === key ? { ...item, hash, hashedAt } : item)));
         })
         .catch(() => {
           /* Hashing is a best-effort demo touch; the file remains listed without a hash. */
+        });
+
+      // Actually keep the file content (as a data URI) so it can be opened
+      // later from the complaint/petition detail page — without this, only
+      // the filename and hash ever survive past this browser tab.
+      readAsDataUrl(file)
+        .then((dataUrl) => {
+          onChange((prev) => prev.map((item) => (fileKey(item) === key ? { ...item, dataUrl } : item)));
+        })
+        .catch(() => {
+          /* If reading fails, the file stays listed without an openable copy. */
         });
 
       // Real OCR (Tesseract.js, in-browser) on images only — screenshots of a bank
@@ -158,8 +193,9 @@ export function EvidenceUpload({
           Select evidence
         </button>
         <p className="mt-2 text-sm text-ink-muted">
-          Screenshots, bank statement excerpts, or PDFs. Drag files here or select them. Each file is fingerprinted with SHA-256 for
-          chain-of-custody, and images are scanned for a transaction reference — all in your browser. Files stay on this device.
+          Screenshots, bank statement excerpts, or PDFs, up to 2 MB each (3 MB total). Drag files here or select them. Each file is
+          fingerprinted with SHA-256 and scanned for a transaction reference right in your browser, then submitted with your complaint so
+          you and the Cyber Cell can both open it later.
         </p>
         {error ? (
           <p className="mt-2 flex items-start gap-1.5 text-sm font-medium text-error">
