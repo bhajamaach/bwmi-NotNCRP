@@ -126,6 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <li><Link className="focus-ring hover:text-navy" href="/report/urgent">{t("Report active fraud")}</Link></li>
                 <li><Link className="focus-ring hover:text-navy" href="/report/standard">{t("Report a cybercrime")}</Link></li>
                 <li><Link className="focus-ring hover:text-navy" href="/track">{t("Track a complaint")}</Link></li>
+                <li><Link className="focus-ring hover:text-navy" href="/track/lookup">{t("Find an anonymous report")}</Link></li>
                 <li><Link className="focus-ring hover:text-navy" href="/unfreeze">{t("Unfreeze an account")}</Link></li>
                 <li><Link className="focus-ring hover:text-navy" href="/suspect-check">{t("Check a suspect")}</Link></li>
               </ul>
@@ -152,7 +153,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <summary className="focus-ring cursor-pointer list-none hover:text-navy">{t("How this works")}</summary>
                     <p className="mt-2 max-w-xs text-ink-muted">
                       {t(
-                        "Complaints and grievance petitions are stored on a real backend, so status is genuinely visible across devices and to the Cyber Cell dashboard. Login, bank contact, 1930, and fund liens are still simulated rather than connected to live banking or government systems. Evidence fingerprints are real SHA-256 hashes, computed in your browser. Hindi coverage is deliberately scoped to the screens where translation accuracy matters most."
+                        "Complaints and grievance petitions are stored on a real backend, so status is genuinely visible across devices and to the Cyber Cell dashboard. Login, bank contact, 1930, and fund liens are still simulated rather than connected to live banking or government systems. This prototype's API isn't scoped per logged-in account the way a production system's would be — there's no real backend authentication yet. Evidence fingerprints are real SHA-256 hashes, computed in your browser. Hindi coverage is deliberately scoped to the screens where translation accuracy matters most."
                       )}
                     </p>
                   </details>

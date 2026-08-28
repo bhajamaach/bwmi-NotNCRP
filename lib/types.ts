@@ -11,6 +11,13 @@ export interface StatusUpdate {
   note: string;
 }
 
+export interface ThreadMessage {
+  id: string;
+  from: "citizen" | "cyberCell";
+  text: string;
+  timestamp: string;
+}
+
 export interface EvidenceFile {
   name: string;
   size: number;
@@ -43,6 +50,8 @@ export interface Complaint {
   accountBalanceAtRisk?: number;
   /** Women/Child-safety reports filed without attaching an account — no citizen dashboard entry. */
   isAnonymous?: boolean;
+  /** Shared two-way thread with Cyber Cell, visible to both sides once the complaint is past RECEIVED. */
+  messages?: ThreadMessage[];
 }
 
 export type GrievanceStage = "SUBMITTED" | "KYC_SCHEDULED" | "IO_REVIEW" | "NOC_ISSUED";

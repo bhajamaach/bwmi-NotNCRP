@@ -5,15 +5,18 @@ import { buildSlaDeadline } from "@/lib/sla-config";
 import type { Complaint, ComplaintDraft } from "@/lib/types";
 
 // GET /api/complaints?userId=xyz -> that user's own complaints.
-// GET /api/complaints (no userId) -> the admin view; anonymous complaints are
-// excluded at the source, not just filtered client-side, so the anonymity
-// guarantee holds even if a future client forgets to filter.
+// GET /api/complaints (no userId) -> the Cyber Cell admin view, which
+// includes anonymous complaints — an anonymous complaint has no name/account
+// attached at the data level regardless of who views it, so Cyber Cell needs
+// to see it to ever act on it. What anonymous actually guarantees is that it
+// never shows up on the FILER's own dashboard (see the userId filter above),
+// not that investigators can't see it exists.
 export async function GET(request: NextRequest) {
   await ready();
   const userId = request.nextUrl.searchParams.get("userId") ?? undefined;
   const result = userId
     ? await pool.query<{ data: Complaint }>("SELECT data FROM complaints WHERE user_id = $1 ORDER BY created_at DESC", [userId])
-    : await pool.query<{ data: Complaint }>("SELECT data FROM complaints WHERE is_anonymous = false ORDER BY created_at DESC");
+    : await pool.query<{ data: Complaint }>("SELECT data FROM complaints ORDER BY created_at DESC");
   return NextResponse.json(result.rows.map((row) => row.data));
 }
 

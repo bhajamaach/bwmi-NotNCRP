@@ -28,8 +28,17 @@ function ConfirmContent() {
         </div>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           {complaint ? <PrimaryLink href={`/track/${complaint.id}`}>Open timeline</PrimaryLink> : null}
-          <SecondaryLink href="/track">View dashboard</SecondaryLink>
+          {complaint?.isAnonymous ? (
+            <SecondaryLink href="/track/lookup">Find it again later</SecondaryLink>
+          ) : (
+            <SecondaryLink href="/track">View dashboard</SecondaryLink>
+          )}
         </div>
+        {complaint?.isAnonymous ? (
+          <p className="mt-4 text-sm text-ink-muted">
+            Save this acknowledgement number now — since no account is attached, it's the only way to find this report again.
+          </p>
+        ) : null}
       </div>
     </PageSection>
   );

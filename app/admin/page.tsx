@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
@@ -32,25 +33,24 @@ export default function AdminPage() {
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
   const [confirmedGrievanceId, setConfirmedGrievanceId] = useState<string | null>(null);
 
-  // Anonymous complaints are routed to a synthetic filer ID by design and
-  // never appear on any filer's own /track — Cyber Cell can act on them
-  // through the underlying queue, but this dashboard view must not expose
-  // them either, or the filer's anonymity guarantee is broken in practice.
-  const visibleComplaints = complaints.filter((complaint) => !complaint.isAnonymous);
-
-  const filteredComplaints = visibleComplaints.filter((complaint) => {
+  // Anonymous complaints have no name/account attached at the data level
+  // regardless of who views them, so Cyber Cell sees them here — otherwise
+  // they could never be assigned or acted on. What anonymity guarantees is
+  // that they never appear on the filer's own /track dashboard, not that
+  // investigators can't see they exist.
+  const filteredComplaints = complaints.filter((complaint) => {
     const matchesSearch = complaint.ackNumber.toLowerCase().includes(search.trim().toLowerCase());
     const matchesStatus = statusFilter === "ALL" || complaint.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const byCategory = visibleComplaints.reduce<Record<string, number>>((acc, complaint) => {
+  const byCategory = complaints.reduce<Record<string, number>>((acc, complaint) => {
     acc[complaint.category] = (acc[complaint.category] ?? 0) + 1;
     return acc;
   }, {});
   const categoryBreakdown = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
-  const escalatedCount = visibleComplaints.filter((complaint) => isEscalated(complaint)).length;
-  const resolvedCount = visibleComplaints.filter((complaint) => complaint.status === "RESOLVED").length;
+  const escalatedCount = complaints.filter((complaint) => isEscalated(complaint)).length;
+  const resolvedCount = complaints.filter((complaint) => complaint.status === "RESOLVED").length;
   const maxCategoryCount = Math.max(1, ...categoryBreakdown.map(([, count]) => count));
 
   return (
@@ -64,7 +64,7 @@ export default function AdminPage() {
       <div className="animate-reveal mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]" style={{ animationDelay: "60ms" }}>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">
-            <p className="font-mono text-xl font-bold text-ink sm:text-2xl">{visibleComplaints.length}</p>
+            <p className="font-mono text-xl font-bold text-ink sm:text-2xl">{complaints.length}</p>
             <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">{t("Total")}</p>
           </div>
           <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">
@@ -144,12 +144,26 @@ export default function AdminPage() {
             return (
               <div className="animate-reveal grid grid-cols-1 gap-3 border-b border-line p-4 last:border-b-0 md:grid-cols-[1fr_0.8fr_0.8fr_0.6fr] md:items-center" key={complaint.id}>
                 <div>
-                  <p className="font-mono font-semibold text-ink">{complaint.ackNumber}</p>
+                  <p className="flex flex-wrap items-center gap-2 font-mono font-semibold text-ink">
+                    {complaint.ackNumber}
+                    {complaint.isAnonymous ? (
+                      <span className="rounded-input border border-line-strong bg-bg-subtle px-2 py-0.5 font-sans text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                        {t("Anonymous")}
+                      </span>
+                    ) : null}
+                  </p>
                   <p className="text-sm text-ink-muted">{isSlaExceeded(complaint) ? t("SLA exceeded") : t("Within SLA window")}</p>
                 </div>
                 <p className="text-ink-muted">{complaint.category}</p>
                 <p className="text-ink-muted">{t(statusLabel(complaint.status))}</p>
                 <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95"
+                    href={`/admin/complaints/${complaint.id}`}
+                  >
+                    {t("View")}
+                  </Link>
                   <button
                     className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95 disabled:opacity-50"
                     disabled={complaint.status === "RESOLVED"}
@@ -162,12 +176,13 @@ export default function AdminPage() {
                   >
                     {complaint.status === "RESOLVED" ? t("Done") : t("Advance")}
                   </button>
-                  {confirmedId === complaint.id ? (
-                    <p className="animate-reveal mt-1 flex items-center gap-1 text-sm font-medium text-teal">
-                      <Icon className="h-3.5 w-3.5 animate-pop" name="check" />
-                      {t("Status updated.")}
-                    </p>
-                  ) : null}
+                </div>
+                {confirmedId === complaint.id ? (
+                  <p className="animate-reveal mt-1 flex items-center gap-1 text-sm font-medium text-teal">
+                    <Icon className="h-3.5 w-3.5 animate-pop" name="check" />
+                    {t("Status updated.")}
+                  </p>
+                ) : null}
                 </div>
               </div>
             );
@@ -205,6 +220,13 @@ export default function AdminPage() {
                 <p className="font-mono text-ink-muted">&hellip;{petition.accountNumber.slice(-4)}</p>
                 <p className="text-ink-muted">{t(grievanceStageLabel(petition.stage))}</p>
                 <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95"
+                    href={`/unfreeze/${petition.id}`}
+                  >
+                    {t("View")}
+                  </Link>
                   <button
                     className="focus-ring rounded-control border border-line px-3 py-2 text-sm font-semibold text-navy transition-all duration-150 hover:bg-bg-subtle active:scale-95 disabled:opacity-50"
                     disabled={!canAdvance}
@@ -221,7 +243,8 @@ export default function AdminPage() {
                   >
                     {t(grievanceActionLabel[petition.stage])}
                   </button>
-                  {confirmedGrievanceId === petition.id ? (
+                </div>
+                {confirmedGrievanceId === petition.id ? (
                     <p className="animate-reveal mt-1 flex items-center gap-1 text-sm font-medium text-teal">
                       <Icon className="h-3.5 w-3.5 animate-pop" name="check" />
                       {t("Updated.")}

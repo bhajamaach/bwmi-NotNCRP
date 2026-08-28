@@ -9,7 +9,8 @@ import type {
   ComplaintStatus,
   DemoUser,
   EvidenceFile,
-  GrievancePetition
+  GrievancePetition,
+  ThreadMessage
 } from "@/lib/types";
 
 interface MockDataContextValue {
@@ -30,6 +31,9 @@ interface MockDataContextValue {
   createGrievance: (input: { accountNumber: string; reason: string; evidence: EvidenceFile[] }) => Promise<GrievancePetition>;
   scheduleKycSlot: (id: string, slot: string) => Promise<void>;
   advanceGrievance: (id: string, note: string) => Promise<void>;
+  sendMessage: (id: string, from: ThreadMessage["from"], text: string) => Promise<void>;
+  /** Links an anonymous complaint to a real account (mobile + demo OTP) and signs the filer in as that account. */
+  claimComplaint: (id: string, mobile: string, otp: string) => Promise<{ ok: true } | { ok: false; error: string }>;
 }
 
 const MockDataContext = createContext<MockDataContextValue | null>(null);
@@ -129,6 +133,21 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
       advanceGrievance: async (id, note) => {
         const updated = await api.advanceGrievance(id, note);
         setGrievances((items) => items.map((petition) => (petition.id === id ? updated : petition)));
+      },
+      sendMessage: async (id, from, text) => {
+        const updated = await api.sendMessage(id, from, text);
+        setComplaints((items) => items.map((complaint) => (complaint.id === id ? updated : complaint)));
+      },
+      claimComplaint: async (id, mobile, otp) => {
+        const result = await api.claimComplaint(id, mobile, otp);
+        if (!result.ok) return result;
+        setComplaints((items) => items.map((complaint) => (complaint.id === id ? result.complaint : complaint)));
+        const user = demoUsers.find((item) => item.mobile === mobile.trim());
+        if (user) {
+          setCurrentUserId(user.id);
+          window.localStorage.setItem(SESSION_STORAGE_KEY, user.id);
+        }
+        return { ok: true };
       }
     }),
     [currentUser, demoUsers, complaints, grievances, isLoaded, loadError]

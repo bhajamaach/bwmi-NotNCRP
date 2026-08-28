@@ -31,17 +31,17 @@ export default function UnfreezePage() {
 
   return (
     <PageSection>
-      <div className="animate-reveal">
+      <div className="animate-reveal mx-auto max-w-2xl">
         <p className="font-mono text-sm font-semibold text-navy">{t("Self-service grievance")}</p>
         <h1 className="mt-1 text-3xl font-bold text-ink sm:text-4xl">{t("Unfreeze my account")}</h1>
-        <p className="mt-2 max-w-2xl text-ink-muted">
+        <p className="mt-2 text-ink-muted">
           {t(
             "If your account was frozen because it received funds later flagged as part of someone else’s fraud case, petition here instead of visiting a bank branch. You’ll book a remote video-KYC slot yourself once this is submitted."
           )}
         </p>
       </div>
       <form
-        className="animate-reveal mt-6 max-w-2xl border-2 border-line-bold rounded-card bg-white p-5"
+        className="animate-reveal mx-auto mt-6 max-w-2xl border-2 border-line-bold rounded-card bg-white p-5"
         style={{ animationDelay: "70ms" }}
         noValidate
         onSubmit={async (event) => {

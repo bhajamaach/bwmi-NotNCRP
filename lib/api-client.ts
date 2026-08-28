@@ -1,4 +1,6 @@
-import type { Complaint, ComplaintDraft, ComplaintStatus, DemoUser, EvidenceFile, GrievancePetition } from "@/lib/types";
+import type { Complaint, ComplaintDraft, ComplaintStatus, DemoUser, EvidenceFile, GrievancePetition, ThreadMessage } from "@/lib/types";
+
+type LookupResult = { ok: true; complaint: Complaint } | { ok: false; error: string };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
@@ -27,5 +29,23 @@ export const api = {
   scheduleKycSlot: (id: string, slot: string) =>
     request<GrievancePetition>(`/api/grievances/${id}/kyc-slot`, { method: "POST", body: JSON.stringify({ slot }) }),
   advanceGrievance: (id: string, note: string) =>
-    request<GrievancePetition>(`/api/grievances/${id}/advance`, { method: "POST", body: JSON.stringify({ note }) })
+    request<GrievancePetition>(`/api/grievances/${id}/advance`, { method: "POST", body: JSON.stringify({ note }) }),
+  sendMessage: (id: string, from: ThreadMessage["from"], text: string) =>
+    request<Complaint>(`/api/complaints/${id}/messages`, { method: "POST", body: JSON.stringify({ from, text }) }),
+  lookupAnonymousComplaint: async (ackNumber: string): Promise<LookupResult> => {
+    const response = await fetch(`/api/complaints/lookup?ackNumber=${encodeURIComponent(ackNumber)}`);
+    const body = await response.json();
+    if (!response.ok) return { ok: false, error: body.error ?? "Not found." };
+    return { ok: true, complaint: body as Complaint };
+  },
+  claimComplaint: async (id: string, mobile: string, otp: string): Promise<LookupResult> => {
+    const response = await fetch(`/api/complaints/${id}/claim`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile, otp })
+    });
+    const body = await response.json();
+    if (!response.ok) return { ok: false, error: body.error ?? "Couldn't link this report." };
+    return { ok: true, complaint: body as Complaint };
+  }
 };

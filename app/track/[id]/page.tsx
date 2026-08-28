@@ -2,19 +2,96 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import { ComplaintThread } from "@/components/ComplaintThread";
 import { EscalationPrompt } from "@/components/EscalationPrompt";
 import { FundRestorationCard } from "@/components/FundRestorationCard";
 import { Icon } from "@/components/Icon";
 import { LienComparison } from "@/components/LienComparison";
 import { useMockData } from "@/components/MockDataProvider";
 import { StatusTimeline } from "@/components/StatusTimeline";
-import { Button, CopyButton, FieldChip, PageSection, PrimaryLink, SecondaryLink } from "@/components/ui";
+import { Button, CopyButton, FieldChip, FieldError, PageSection, PrimaryLink, SecondaryLink, buttonPrimaryClass } from "@/components/ui";
 import { getSlaForCategory } from "@/lib/sla-config";
 import { formatDateTime, statusLabel } from "@/lib/status";
+import type { Complaint } from "@/lib/types";
+
+function ClaimCard({ complaint }: { complaint: Complaint }) {
+  const { claimComplaint } = useMockData();
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<"mobile" | "otp">("mobile");
+  const [error, setError] = useState("");
+  // Derived from the complaint itself, not local state — local state would
+  // vanish the instant the parent re-evaluates its render condition after
+  // userId changes, right when we most need to show the success message.
+  const isLinked = complaint.userId !== "anonymous";
+
+  if (isLinked) {
+    return (
+      <div className="border-2 border-line-bold border-l-4 border-l-teal rounded-card bg-white p-5">
+        <h2 className="font-bold text-teal">Linked to your account</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          This report will now also appear on your <a className="font-semibold text-navy underline" href="/track">tracking dashboard</a>. It's
+          still recorded as originally filed anonymously.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-2 border-line-bold rounded-card bg-white p-5">
+      <h2 className="font-bold text-ink">Link this report to your account</h2>
+      <p className="mt-1 text-sm text-ink-muted">
+        Optional. Linking lets this show up on your own tracking dashboard alongside other complaints. It stays marked as originally
+        anonymous either way.
+      </p>
+      <form
+        className="mt-3 grid gap-3"
+        noValidate
+        onSubmit={async (event) => {
+          event.preventDefault();
+          setError("");
+          if (step === "mobile") {
+            if (!/^\d{10}$/.test(mobile.trim())) {
+              setError("Enter one of the sample mobile numbers, e.g. 9000000001.");
+              return;
+            }
+            setStep("otp");
+            return;
+          }
+          const result = await claimComplaint(complaint.id, mobile.trim(), otp.trim());
+          if (!result.ok) {
+            setError(result.error);
+          }
+        }}
+      >
+        <input
+          className="focus-ring w-full rounded-input border border-line bg-white px-3 py-2 font-mono text-sm"
+          inputMode="numeric"
+          onChange={(event) => setMobile(event.target.value)}
+          placeholder="Mobile number, e.g. 9000000001"
+          value={mobile}
+        />
+        {step === "otp" ? (
+          <input
+            className="focus-ring w-full rounded-input border border-line bg-white px-3 py-2 font-mono text-sm"
+            inputMode="numeric"
+            onChange={(event) => setOtp(event.target.value)}
+            placeholder="Any six-digit code"
+            value={otp}
+          />
+        ) : null}
+        <FieldError id="claim-error">{error}</FieldError>
+        <button className={`${buttonPrimaryClass} w-fit`} type="submit">
+          {step === "mobile" ? "Continue" : "Link this report"}
+        </button>
+      </form>
+    </div>
+  );
+}
 
 export default function ComplaintDetailPage() {
   const params = useParams<{ id: string }>();
-  const { complaints, addCitizenNote } = useMockData();
+  const { complaints, addCitizenNote, sendMessage } = useMockData();
   const complaint = complaints.find((item) => item.id === params.id);
   const [noteText, setNoteText] = useState("");
   const [noteConfirmed, setNoteConfirmed] = useState(false);
@@ -87,6 +164,12 @@ export default function ComplaintDetailPage() {
         </section>
         <aside className="grid gap-4">
           <EscalationPrompt complaint={complaint} />
+          {complaint.isAnonymous ? <ClaimCard complaint={complaint} /> : null}
+          <ComplaintThread
+            complaint={complaint}
+            onSend={(text) => sendMessage(complaint.id, "citizen", text)}
+            role="citizen"
+          />
           <FundRestorationCard complaint={complaint} />
           <LienComparison complaint={complaint} />
           <div className="border border-line rounded-card bg-white p-5">
