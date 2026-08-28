@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   return (
     <PageSection>
-      <div className="animate-reveal mx-auto max-w-xl border border-line rounded-card bg-white p-6">
+      <div className="animate-reveal mx-auto max-w-xl border-2 border-line-bold rounded-card bg-white p-6">
         <h1 className="text-3xl font-bold text-ink">{t("Login")}</h1>
         <p className="mt-2 text-ink-muted">{t("Use one of the sample numbers below and any six-digit code, such as 123456.")}</p>
         <div className="mt-5 border border-line rounded-control bg-bg-subtle p-4 text-sm text-ink-muted">

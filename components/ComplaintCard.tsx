@@ -17,7 +17,7 @@ export function ComplaintCard({ complaint, index = 0 }: { complaint: Complaint; 
 
   return (
     <Link
-      className={`animate-reveal focus-ring block border border-line border-l-4 ${accentClass} rounded-card bg-white p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-navy hover:shadow-md`}
+      className={`animate-reveal focus-ring block border-2 border-line-bold border-l-4 ${accentClass} rounded-card bg-white p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-navy hover:shadow-md`}
       href={`/track/${complaint.id}`}
       style={{ animationDelay: `${index * 60}ms` }}
     >

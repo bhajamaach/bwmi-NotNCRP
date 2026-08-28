@@ -36,7 +36,7 @@ export default function GrievanceDetailPage() {
         {t("Back to dashboard")}
       </SecondaryLink>
       <div className="animate-reveal mt-4 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-        <section className="border border-line rounded-card bg-white p-5">
+        <section className="border-2 border-line-bold rounded-card bg-white p-5">
           <FieldChip>{petition.petitionNumber}</FieldChip>
           <h1 className="mt-2 text-3xl font-bold leading-tight text-ink">
             {t("Account ending")} {petition.accountNumber.slice(-4)}

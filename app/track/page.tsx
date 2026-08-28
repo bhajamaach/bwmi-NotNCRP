@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
 import { PageSection, PrimaryLink, SecondaryLink } from "@/components/ui";
+import { isEscalated } from "@/lib/status";
 
 type FilterId = "all" | "active" | "resolved" | "escalated";
 
@@ -24,7 +25,7 @@ export default function TrackPage() {
   if (!currentUser) {
     return (
       <PageSection>
-        <div className="animate-reveal border border-line rounded-card bg-white p-6">
+        <div className="animate-reveal border-2 border-line-bold rounded-card bg-white p-6">
           <h1 className="text-2xl font-bold text-ink">{t("Login to view complaints")}</h1>
           <p className="mt-2 text-ink-muted">{t("Reporting is open to anyone, but tracking your complaints requires signing in.")}</p>
           <div className="mt-5">
@@ -39,7 +40,7 @@ export default function TrackPage() {
   const filteredComplaints = userComplaints.filter((complaint) => {
     if (filter === "active") return complaint.status !== "RESOLVED";
     if (filter === "resolved") return complaint.status === "RESOLVED";
-    if (filter === "escalated") return complaint.escalated === true;
+    if (filter === "escalated") return isEscalated(complaint);
     return true;
   });
 

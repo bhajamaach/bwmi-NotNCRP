@@ -6,7 +6,7 @@ import { useLocale } from "@/components/LocaleProvider";
 import { useMockData } from "@/components/MockDataProvider";
 import { PageSection } from "@/components/ui";
 import { grievanceStageLabel } from "@/lib/grievance";
-import { isSlaExceeded, statusLabel, statusSteps } from "@/lib/status";
+import { isEscalated, isSlaExceeded, statusLabel, statusSteps } from "@/lib/status";
 import type { ComplaintStatus } from "@/lib/types";
 
 const nextStatus: Record<ComplaintStatus, ComplaintStatus> = {
@@ -32,19 +32,25 @@ export default function AdminPage() {
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
   const [confirmedGrievanceId, setConfirmedGrievanceId] = useState<string | null>(null);
 
-  const filteredComplaints = complaints.filter((complaint) => {
+  // Anonymous complaints are routed to a synthetic filer ID by design and
+  // never appear on any filer's own /track — Cyber Cell can act on them
+  // through the underlying queue, but this dashboard view must not expose
+  // them either, or the filer's anonymity guarantee is broken in practice.
+  const visibleComplaints = complaints.filter((complaint) => !complaint.isAnonymous);
+
+  const filteredComplaints = visibleComplaints.filter((complaint) => {
     const matchesSearch = complaint.ackNumber.toLowerCase().includes(search.trim().toLowerCase());
     const matchesStatus = statusFilter === "ALL" || complaint.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const byCategory = complaints.reduce<Record<string, number>>((acc, complaint) => {
+  const byCategory = visibleComplaints.reduce<Record<string, number>>((acc, complaint) => {
     acc[complaint.category] = (acc[complaint.category] ?? 0) + 1;
     return acc;
   }, {});
   const categoryBreakdown = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
-  const escalatedCount = complaints.filter((complaint) => isSlaExceeded(complaint) || complaint.escalated).length;
-  const resolvedCount = complaints.filter((complaint) => complaint.status === "RESOLVED").length;
+  const escalatedCount = visibleComplaints.filter((complaint) => isEscalated(complaint)).length;
+  const resolvedCount = visibleComplaints.filter((complaint) => complaint.status === "RESOLVED").length;
   const maxCategoryCount = Math.max(1, ...categoryBreakdown.map(([, count]) => count));
 
   return (
@@ -58,7 +64,7 @@ export default function AdminPage() {
       <div className="animate-reveal mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]" style={{ animationDelay: "60ms" }}>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">
-            <p className="font-mono text-xl font-bold text-ink sm:text-2xl">{complaints.length}</p>
+            <p className="font-mono text-xl font-bold text-ink sm:text-2xl">{visibleComplaints.length}</p>
             <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-ink-muted sm:text-xs">{t("Total")}</p>
           </div>
           <div className="border border-line rounded-card bg-white p-3 transition-shadow duration-150 hover:shadow-md sm:p-4">

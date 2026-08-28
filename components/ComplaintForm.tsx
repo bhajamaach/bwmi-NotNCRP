@@ -73,7 +73,7 @@ export function ComplaintForm({
 
   return (
     <form
-      className="border border-line rounded-card bg-white p-5"
+      className="border-2 border-line-bold rounded-card bg-white p-5"
       noValidate
       onSubmit={(event) => {
         event.preventDefault();

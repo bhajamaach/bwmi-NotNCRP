@@ -54,7 +54,7 @@ export default function ComplaintDetailPage() {
         Back to dashboard
       </SecondaryLink>
       <div className="animate-reveal mt-4 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-        <section className="border border-line rounded-card bg-white p-5">
+        <section className="border-2 border-line-bold rounded-card bg-white p-5">
           <div className="flex flex-wrap items-center gap-2">
             <FieldChip>{complaint.ackNumber}</FieldChip>
             <CopyButton value={complaint.ackNumber} />

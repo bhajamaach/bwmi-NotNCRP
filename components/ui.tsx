@@ -18,7 +18,7 @@ export const buttonSecondaryClass = `${buttonBase} border-line bg-white text-nav
  * Shared "formal choice list" pattern (landing A/B/C, CategoryQA top-level and
  * nested sub-choice lists). Hairline border, row dividers stay light gray.
  */
-export const choiceListClass = "divide-y divide-line rounded-card border border-line bg-white";
+export const choiceListClass = "divide-y divide-line rounded-card border-2 border-line-bold bg-white";
 export const choiceRowClass =
   "group focus-ring flex w-full items-start gap-3 border-2 border-transparent text-left transition-all duration-150 hover:border-navy hover:bg-bg-subtle active:scale-[0.995]";
 export const choiceRowSelectedClass = "border-navy bg-bg-subtle";
@@ -93,7 +93,7 @@ export function RequiredMark() {
 
 export function FieldChip({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={`inline-block rounded-input border border-line-strong px-3 py-1.5 font-mono text-base font-bold text-ink ${className}`}>
+    <span className={`inline-block rounded-input border-2 border-line-bold px-3 py-1.5 font-mono text-xl font-bold text-ink ${className}`}>
       {children}
     </span>
   );

@@ -46,7 +46,7 @@ export function ChecklistCard({
   const pickedBank = bankDirectory.find((entry) => entry.code === pickedBankCode);
 
   return (
-    <aside className="border border-line rounded-card bg-white p-5">
+    <aside className="border-2 border-line-bold rounded-card bg-white p-5">
       <h2 className="text-lg font-bold text-ink">{t("Do these in parallel")}</h2>
       <p className="mt-1 text-sm text-ink-muted">
         {t("This app doesn't place calls or contact anyone for you — these are the actions to take yourself, right now.")}

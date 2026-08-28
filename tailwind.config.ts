@@ -40,9 +40,9 @@ const config: Config = {
         }
       },
       borderRadius: {
-        input: "8px",
-        control: "10px",
-        card: "12px"
+        input: "2px",
+        control: "4px",
+        card: "6px"
       },
       fontFamily: {
         sans: [

@@ -47,7 +47,7 @@ export function CategoryQA() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="border border-line rounded-card bg-white p-5">
+      <section className="border-2 border-line-bold rounded-card bg-white p-5">
         <h1 className="text-3xl font-bold leading-tight text-ink sm:text-4xl">{t("What happened?")}</h1>
         <p className="mt-2 text-ink-muted">
           {t("Choose the plain-language description closest to your situation. We map it to a complaint category in the background.")}
@@ -144,7 +144,7 @@ export function CategoryQA() {
             />
           </div>
         ) : (
-          <div className="border border-line rounded-card bg-white p-6">
+          <div className="border-2 border-line-bold rounded-card bg-white p-6">
             <h2 className="text-xl font-bold text-ink">{t("Complaint form")}</h2>
             <p className="mt-2 text-ink-muted">
               {choice

@@ -37,6 +37,24 @@ export function isSlaExceeded(complaint: Complaint) {
   return complaint.status !== "RESOLVED" && new Date(complaint.slaDeadline).getTime() < Date.now();
 }
 
+/**
+ * The single definition of "escalated" for the whole app — a complaint is
+ * escalated either because the citizen explicitly escalated it, or because
+ * it has silently blown its SLA. Every screen that shows an Escalated
+ * count/filter/badge should use this instead of re-deriving it.
+ */
+export function isEscalated(complaint: Complaint) {
+  return complaint.escalated || isSlaExceeded(complaint);
+}
+
+export function formatDurationShort(ms: number) {
+  const totalMinutes = Math.max(0, Math.round(Math.abs(ms) / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes}m`;
+  return `${hours}h ${minutes}m`;
+}
+
 export function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
